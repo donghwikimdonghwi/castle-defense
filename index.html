@@ -2676,7 +2676,62 @@ $("modalRank").hidden = !rankEnabled();
 renderRankBoards();
 loadRanking();
 loadHall();
+
+const NOTICE_KEY = "castle_notice_v1";
+
+if (localStorage.getItem(NOTICE_KEY) === "1") {
+  $("noticeModal").hidden = true;
+} else {
+
+  hideModal();
+
+  $("noticeBtn").onclick = () => {
+
+    if ($("hideToday").checked) {
+      localStorage.setItem(NOTICE_KEY, "1");
+    }
+
+    $("noticeModal").hidden = true;
+
+    showModal(
+      "🏰 성을 지켜라!",
+      `처음에는 궁수 한 명뿐입니다.
+레벨업마다 카드 3장 중 하나를 고르세요.
+범위 공격만으로는 정예와 보스를 잡기 어렵습니다.`,
+      "",
+      "▶ 게임 시작"
+    );
+  };
+}
+
 requestAnimationFrame(loop);
+
 </script>
+ /***********************************************/
+ <div id="noticeModal" class="modal">
+  <div class="modal-box">
+    <h2>📢 공지사항</h2>
+
+    <p>
+신규 업데이트!
+
+⚡ 각성 시스템 추가
+🐉 신규 보스 추가
+🏆 온라인 랭킹 추가
+
+즐겁게 플레이해주세요.
+    </p>
+
+    <label style="display:block;margin:15px 0;color:#cbd5e1;">
+      <input type="checkbox" id="hideToday">
+      오늘 다시 보지 않기
+    </label>
+
+    <button id="noticeBtn" class="btn primary">
+      확인
+    </button>
+  </div>
+</div>
+/***********************************************/
 </body>
 </html>
