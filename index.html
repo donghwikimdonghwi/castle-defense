@@ -257,7 +257,8 @@
     <h2 id="modalTitle">🏰 성을 지켜라!</h2>
     <p id="modalText">처음에는 궁수 한 명뿐입니다.
 레벨업마다 카드 3장 중 하나를 고르세요.
-범위 공격만으로는 정예와 보스를 잡기 어렵습니다. 단일 공격과 섞어 키우세요!</p>
+부적절한 닉네임은 경고없이 삭제될 수 있습니다.
+개발자: 김동휘</p>
     <div id="dmgReport" class="dmg-report" hidden></div>
     <div id="rankSubmit" class="rank-submit" hidden>
       <div class="dmg-head">🏆 랭킹 등록</div>
@@ -283,6 +284,37 @@
       <span class="key-hint">키보드 1 / 2 / 3 선택 · R 리롤</span>
     </div>
     <button id="modalBtn" class="btn primary" type="button">▶ 게임 시작</button>
+  </div>
+</div>
+/* =========================================================
+   16. 공지사항
+   ========================================================= */
+<div id="noticeModal" class="modal">
+  <div class="modal-box">
+    <h2>📢 공지사항</h2>
+
+    <p>
+!!!업데이트 예정!!!
+
+v7 업데이트 예정입니다.
+!업데이트되면 전체랭킹이 초기화됩니다!
+TOP3는 v6 명예의전당에 저장됩니다.
+- 병기 밸런스 조정
+- 성 강화 특성 개편
+- 진화/각성 리워크(할 수도 있음)
+- 병기 추가 예정
+
+즐겁게 플레이해주세요.
+    </p>
+
+    <label style="display:block;margin:15px 0;color:#cbd5e1;">
+      <input type="checkbox" id="hideToday">
+      오늘 다시 보지 않기
+    </label>
+
+    <button id="noticeBtn" class="btn primary">
+      확인
+    </button>
   </div>
 </div>
 <script>
@@ -2676,6 +2708,24 @@ $("modalRank").hidden = !rankEnabled();
 renderRankBoards();
 loadRanking();
 loadHall();
+const NOTICE_KEY = "castle_notice_v6.1";
+if (localStorage.getItem(NOTICE_KEY) !== "1") {
+
+  $("modal").hidden = true;
+
+  $("noticeBtn").addEventListener("click", () => {
+
+    if ($("hideToday").checked) {
+      localStorage.setItem(NOTICE_KEY, "1");
+    }
+
+    $("noticeModal").hidden = true;
+    $("modal").hidden = false;
+  });
+
+} else {
+  $("noticeModal").hidden = true;
+}
 requestAnimationFrame(loop);
 </script>
 </body>
