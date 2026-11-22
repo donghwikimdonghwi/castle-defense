@@ -178,18 +178,9 @@
     .rank-row { grid-template-columns: 36px minmax(50px, 1fr) auto; padding: 8px 10px; }
   }
 </style>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <main class="app">
-<div id="loginArea" style="margin-bottom:12px;">
-  <div id="g_id_onload"
-       data-client_id="858043871396-ne5i9gbvdan520gob4v60dl3234lugnb.apps.googleusercontent.com"
-       data-callback="handleCredentialResponse">
-  </div>
-
-  <div class="g_id_signin"></div>
-</div>
   <header>
     <div>
       <h1>🏰 작은 성 지키기 v6</h1>
@@ -328,23 +319,6 @@ TOP3는 v6 명예의전당에 저장됩니다.
 </div>
 <script>
 "use strict";
- let googleUser = null;
-
-function handleCredentialResponse(response) {
-  const payload = JSON.parse(
-    atob(response.credential.split(".")[1])
-  );
-
-  googleUser = {
-    name: payload.name,
-    email: payload.email
-  };
-
-  alert(
-    "이름: " + googleUser.name +
-    "\n이메일: " + googleUser.email
-  );
-}
 /* =========================================================
    1. 기본 설정
    ========================================================= */
