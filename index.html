@@ -340,7 +340,10 @@ function handleCredentialResponse(response) {
     email: payload.email
   };
 
-  console.log("로그인됨:", googleUser);
+  alert(
+    "이름: " + googleUser.name +
+    "\n이메일: " + googleUser.email
+  );
 }
 /* =========================================================
    1. 기본 설정
