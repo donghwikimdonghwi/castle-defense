@@ -328,6 +328,20 @@ TOP3는 v6 명예의전당에 저장됩니다.
 </div>
 <script>
 "use strict";
+ let googleUser = null;
+
+function handleCredentialResponse(response) {
+  const payload = JSON.parse(
+    atob(response.credential.split(".")[1])
+  );
+
+  googleUser = {
+    name: payload.name,
+    email: payload.email
+  };
+
+  console.log("로그인됨:", googleUser);
+}
 /* =========================================================
    1. 기본 설정
    ========================================================= */
