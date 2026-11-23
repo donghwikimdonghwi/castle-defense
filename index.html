@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>작은 성 지키기 v6 - 각성과 보스</title>
+<title>작은 성 지키기 v7 - 도감과 검사</title>
 <style>
   * { box-sizing: border-box; }
   :root {
@@ -46,7 +46,7 @@
   .btn { border: 0; border-radius: 11px; padding: 12px 18px; background: #334155; color: white; font-weight: 800; cursor: pointer; touch-action: manipulation; }
   .btn.primary { background: #6366f1; }
   .btn.primary:hover:not(:disabled) { background: #4f46e5; }
-  .btn.fast { background: #b45309; }
+  .btn.primary.pseudo-disabled, .btn.primary.pseudo-disabled:hover { background: #6366f1; opacity: .45; cursor: not-allowed; }
   #message { min-height: 22px; margin: 4px 0 10px; color: #fde68a; font-size: 14px; }
   h2.section { margin: 14px 0 8px; font-size: 15px; color: #cbd5e1; }
   .roster { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
@@ -132,6 +132,7 @@
   .rank-tabs { flex-wrap: wrap; }
   .tab.hall { border-color: #a16207; color: #fde68a; }
   .tab.hall.active { background: linear-gradient(90deg, #a16207, #ca8a04); border-color: #ca8a04; color: #fff; }
+  .hall-season + .hall-season { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(161, 98, 7, .45); }
   .hall-head { text-align: center; margin-bottom: 10px; color: #fde68a; font-weight: 900; font-size: 15px; letter-spacing: 1px; }
   .hall-head small { display: block; color: #94a3b8; font-weight: 600; font-size: 12px; letter-spacing: 0; margin-top: 3px; }
   .rank-list { display: grid; gap: 6px; text-align: left; }
@@ -142,7 +143,16 @@
     padding: 9px 12px; border-radius: 12px; background: #0f172a; border: 1px solid #334155;
   }
   .rank-row .pos { grid-area: pos; font-size: 18px; font-weight: 900; text-align: center; color: #94a3b8; }
-  .rank-row .nick { grid-area: nick; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-row .nick { grid-area: nick; font-weight: 800; display: flex; align-items: center; gap: 5px; min-width: 0; flex-wrap: wrap; }
+  .rank-row .nick .nick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* 칭호 뱃지 (시즌 명예의 전당 1~3위, 관리자가 titles 시트에 직접 입력) */
+  .title-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 900; line-height: 1.5;
+                 white-space: nowrap; color: #1c1917; }
+  .title-badge.r1 { color: #422006; background: linear-gradient(110deg, #f59e0b 0%, #fde68a 40%, #fffbeb 50%, #fde68a 60%, #f59e0b 100%);
+                    background-size: 250% 100%; animation: titleShine 2.4s linear infinite; box-shadow: 0 0 10px rgba(251, 191, 36, .75); }
+  .title-badge.r2 { background: linear-gradient(180deg, #f1f5f9, #94a3b8); box-shadow: 0 0 6px rgba(203, 213, 225, .5); }
+  .title-badge.r3 { color: #fff7ed; background: linear-gradient(180deg, #d97706, #9a3412); box-shadow: 0 0 6px rgba(217, 119, 6, .5); }
+  @keyframes titleShine { from { background-position: 100% 0; } to { background-position: -150% 0; } }
   .rank-row .time { grid-area: time; text-align: right; font-weight: 900; color: #fde68a; font-variant-numeric: tabular-nums; }
   .rank-row .meta { grid-area: meta; font-size: 12px; color: #94a3b8; }
   .rank-row .meta .evo-name { color: #d8b4fe; }
@@ -165,6 +175,23 @@
   .rank-status.ok { color: #86efac; }
   .rank-status.err { color: #fda4af; }
   .modal-rank { margin: 0 0 16px; text-align: left; }
+  /* 카드 도감: 카드가 실제 선택지에 등장했을 때 해금 */
+  .codex-box { text-align: left; }
+  .codex-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+  .codex-head h2 { margin:0; }
+  .codex-summary { color:#94a3b8; font-size:13px; margin-bottom:12px; }
+  .codex-groups { display:grid; gap:14px; }
+  .codex-group h3 { margin:0 0 7px; color:#fde68a; font-size:15px; }
+  .codex-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; }
+  .codex-card { padding:11px; border:1px solid #475569; border-radius:12px; background:#0f172a; line-height:1.45; }
+  .codex-card strong { display:block; color:#f8fafc; margin-bottom:4px; }
+  .codex-card small { display:block; color:#94a3b8; margin-bottom:5px; }
+  .codex-card span { display:block; white-space:pre-line; font-size:12px; color:#cbd5e1; }
+  .codex-card.locked { filter:saturate(.2); opacity:.52; }
+  .codex-card.locked strong { color:#64748b; }
+  .codex-status { color:#a5b4fc; font-size:12px; min-height:18px; margin-top:10px; }
+  .codex-tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  body.codex-open { overflow:hidden; }
   @media (max-width: 640px) {
     body { padding: 10px 8px; }
     .stats, .records { grid-template-columns: repeat(2, 1fr); gap: 6px; }
@@ -183,7 +210,7 @@
 <main class="app">
   <header>
     <div>
-      <h1>🏰 작은 성 지키기 v6</h1>
+      <h1>🏰 작은 성 지키기 v7</h1>
       <p class="subtitle">특성으로 진화하고, 각성으로 한계를 넘어 랭킹 1위에 도전하세요</p>
     </div>
     <span id="stateBadge" class="badge" data-state="idle">⏳ 시작 대기</span>
@@ -212,18 +239,18 @@
   <div class="controls">
     <button id="startBtn" class="btn primary" type="button">▶ 게임 시작</button>
     <button id="pauseBtn" class="btn" type="button" disabled>⏸ 일시정지</button>
-    <button id="speedBtn" class="btn" type="button">⏩ 1배속</button>
     <button id="restartBtn" class="btn" type="button" disabled>↻ 다시 시작</button>
     <button id="soundBtn" class="btn" type="button">🔊 효과음 켬</button>
+    <button id="codexBtn" class="btn" type="button">📖 카드 도감</button>
   </div>
   <p id="message" role="status" aria-live="polite">시작 버튼을 누르면 적이 몰려옵니다!</p>
 
-  <h2 class="section">🏆 온라인 랭킹 · <span id="rankVer">v6</span> (생존 시간 기준)</h2>
+  <h2 class="section">🏆 온라인 랭킹 · <span id="rankVer">v7</span> (생존 시간 기준)</h2>
   <section class="card" aria-label="온라인 랭킹">
     <div class="rank-tabs">
       <button class="tab active" type="button" data-tab="all">전체 TOP 3</button>
       <button class="tab" type="button" data-tab="today">오늘 TOP 10</button>
-      <button class="tab hall" type="button" data-tab="hall">🏛️ v5 명예의 전당</button>
+      <button class="tab hall" type="button" data-tab="hall">🏛️ 명예의 전당</button>
       <button id="rankRefresh" class="tab icon" type="button" title="랭킹 새로고침">↻ 새로고침</button>
     </div>
     <div id="rankBoard"></div>
@@ -242,13 +269,13 @@
     <b>성장</b> · 기본 강화 2번 → <b>특성</b> 해금 · 특성 2개 짝 → <b>🧬 진화</b> ·
     진화 + 특성 4개 + 공격력 Lv5 → 낮은 확률로 <b>⚡ 각성</b>(병기당 1개, 강화 한계 상승 + 특별 공격)<br>
     <b>병기 특징</b> · 🏹 궁수: 잡몹에 강함(적을 잡으면 남은 피해로 다음 적 공격), 나는 적에게 피해 +30% ·
-    🔱 창: 정예·보스에 강함(3관통, 정예·보스 +40%) · 🎯 발리스타: 무제한 관통 ·
+    ⚔️ 검사: 성 앞 초근접 반달 베기(범위 분산·정예 저항 제외) · 🔱 창: 정예·보스에 강함(3관통, 정예·보스 +40%) · 🎯 발리스타: 무제한 관통 ·
     💣 대포: 강한 범위 폭발 · 🔥 화염병: 불길은 방어력과 정예의 범위 저항을 무시 · ❄️ 얼음: 범위 둔화 + 받는 피해 증가<br>
     <b>범위 공격 규칙</b> · 한 번에 6마리 이상 맞히면 피해가 나뉩니다 · 정예(오크·기사·골렘)는 범위 피해 <span id="eliteResText">35</span>% 감소 · 🛡️ 방패병은 <span id="shieldResText">60</span>% 감소 · 바닥 불길은 나는 적에게 닿지 않음<br>
     <b>보스</b> · 🐺 늑대왕(포효로 늑대 광폭화, 예고 후 돌진) → 🛡️ 철갑 장군(방패벽은 단일 공격으로만 깨짐) →
     🧙 역병 주술사(치유 의식, 단일 공격 4번 맞히면 차단) → 🐉 화룡(비행 중 대포·화염 면역, 착지할 때가 기회)<br>
     <b>⚠️ 대군 러시</b> · 전멸시키면 다음 카드 희귀 이상 보장 · <b>🏆 랭킹</b> · 생존 시간 기준(일시정지·카드 선택 시간 제외, 배속과 무관)<br>
-    단축키 · Space/P 일시정지 · F 배속 · 1/2/3 선택 · R 리롤
+    단축키 · Space/P 일시정지 · 1/2/3 선택 · R 리롤
   </p>
   <p id="storageNote" class="help"></p>
 </main>
@@ -257,7 +284,7 @@
     <h2 id="modalTitle">🏰 성을 지켜라!</h2>
     <p id="modalText">처음에는 궁수 한 명뿐입니다.
 레벨업마다 카드 3장 중 하나를 고르세요.
-부적절한 닉네임은 경고없이 삭제될 수 있습니다.
+실명 외 닉네임은 삭제합니다.
 개발자: 김동휘</p>
     <div id="dmgReport" class="dmg-report" hidden></div>
     <div id="rankSubmit" class="rank-submit" hidden>
@@ -273,7 +300,7 @@
       <div class="rank-tabs">
         <button class="tab active" type="button" data-tab="all">전체 TOP 3</button>
         <button class="tab" type="button" data-tab="today">오늘 TOP 10</button>
-        <button class="tab hall" type="button" data-tab="hall">🏛️ v5 명예의 전당</button>
+        <button class="tab hall" type="button" data-tab="hall">🏛️ 명예의 전당</button>
       </div>
       <div id="modalRankBoard"></div>
     </div>
@@ -294,17 +321,66 @@
     <h2>📢 공지사항</h2>
 
     <p>
-!!!업데이트 예정!!!
+# 🏰 작은 성 지키기 v7 패치노트
 
-v7 업데이트 예정입니다.
-!업데이트되면 전체랭킹이 초기화됩니다!
-TOP3는 v6 명예의전당에 저장됩니다.
-- 병기 밸런스 조정
-- 성 강화 특성 개편
-- 진화/각성 리워크(할 수도 있음)
-- 병기 추가 예정
+!!중요!! 닉네임/데이터 관리를 위해 1인 1계정으로 운영하려합니다. 
+@@@ v7부터는 실명 닉 제외 모두 삭제합니다. @@@
 
-즐겁게 플레이해주세요.
+## 🆕 새로운 요소
+
+### ⚔️ 신규 병기: 검사
+- 성 바로 앞에서 반달 모양으로 칼을 휘두르는 초근접 범위 병기입니다.
+- 사거리는 약 110px로 짧지만, 범위 안의 적을 한꺼번에 벱니다. 다수 타격 피해 분산과 정예 범위 저항이 적용되지 않습니다.
+
+### 📖 카드 도감
+- 특성 35개, 진화 35개, 각성 14개로 모두 84개 카드가 도감에 기록됩니다.
+- 카드가 뜨면, 게임 종료 후 도감에 등록됩니다.
+- 아직 만나지 못한 카드는 `???`로 표시되고, 발견하면 출현 조건과 강화 내용이 공개됩니다.
+
+### 👑 시즌 칭호
+- 지난 시즌 TOP3에게 👑 패왕, 🥈 2위, 🥉 3위 칭호가 닉네임 옆에 표시됩니다.
+- 이번 v7 랭킹은 새로 집계되고, v6 TOP3는 명예의 전당에서 볼 수 있습니다.
+
+## ⚖️ 밸런스 조정
+
+### 🏹 궁수
+| 항목 | 변경 전 | 변경 후 |
+|---|---|---|
+| 그림자 사수 | 공격력 ×4 / 최대 HP 2% | 공격력 **×2.8** / 최대 HP **1.0%** |
+| 폭풍의 궁수 | 공격력 ×1.2 | 공격력 **×1.3** |
+
+### ❄️얼음법사
+- **빙하 창기사**
+  - 공격력 ×2.5에서 **×2.1**로 하향되었습니다.
+  - 냉기 증폭은 20%, 무한 관통은 그대로입니다.
+
+### 🔱 창
+- **용기병**: 모든 창병이 보스를 우선 공격하고 보스 피해가 증가합니다.
+- **뇌신창**: 번개 연쇄 범위와 횟수가 강화되었습니다.
+
+### 🔥 화염병
+- **화상 중첩**: 최대 5중첩, 중첩당 화상 피해 +10%, 3초 동안 유지되며 다시 맞으면 갱신됩니다.
+- **5중첩 효과**: 초당 최대 HP 0.3% 피해를 줍니다. 정예는 50%, 보스는 25%만 적용됩니다.
+- 장판이 겹치면 가장 강한 장판 하나만 피해를 줍니다.
+- 골렘의 화염 저항이 제거되었습니다.
+
+### 💣 대포 / 🏹 발리스타
+- **대포**: 불 속성이 제거되었습니다. 소이탄은 **고폭탄**, 네이팜 포격은 **초대형 포탄**으로 바뀌었습니다.
+- **자주포 부대**: 최종 공격력 +5%
+- **발리스타**: 기본 공격력 +5%
+- **레일건·폭뢰 쇠뇌**: 소폭 상향
+
+### 🧱 성벽
+- 성벽 업그레이드가 **증축 → 요새화 / 가시 성벽** 계통으로 개편되었습니다.
+
+### 🃏 카드 및 각성
+- 병기별 특성 보유 한도는 **5개 -> 4개**입니다.
+- 각성 조건이 병기에 맞게 공격력형과 속도형으로 나뉘었습니다.
+
+## 🛠️ 기타 변경
+- 게임 기본 속도가 2배속으로 변경되었습니다.
+- 레벨업 후 카드 선택이 지연되던 기능을 제거하였습니다.
+
     </p>
 
     <label style="display:block;margin:15px 0;color:#cbd5e1;">
@@ -315,6 +391,23 @@ TOP3는 v6 명예의전당에 저장됩니다.
     <button id="noticeBtn" class="btn primary">
       확인
     </button>
+  </div>
+</div>
+<div id="codexModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="codexTitle" hidden>
+  <div class="modal-box codex-box">
+    <div class="codex-head">
+      <h2 id="codexTitle">📖 카드 도감</h2>
+      <button id="codexClose" class="btn" type="button">닫기</button>
+    </div>
+    <div id="codexSummary" class="codex-summary"></div>
+    <div class="codex-tabs">
+      <button class="tab active" type="button" data-codex="all">전체</button>
+      <button class="tab" type="button" data-codex="trait">특성</button>
+      <button class="tab" type="button" data-codex="evo">진화</button>
+      <button class="tab" type="button" data-codex="awaken">각성</button>
+    </div>
+    <div id="codexGroups" class="codex-groups"></div>
+    <div id="codexStatus" class="codex-status"></div>
   </div>
 </div>
 <script>
@@ -335,6 +428,7 @@ const WAVE_TIME = 22;              // 22초마다 웨이브 증가
 const DMG_MUL = 1.25;              // 공격력 강화 1단계 = ×1.25 (복리)
 const SPD_MUL = 1.15;              // 공격속도 강화 1단계 = ×1.15 (복리)
 const BASE_DMG_CAP = 10;           // 공격력 강화 한계 (각성하면 +3)
+const TRAIT_CAP = 4;              // 병기마다 특성은 최대 4개
 const RARE_CHANCE = 0.12;          // 희귀 카드 확률
 const LEGEND_CHANCE = 0.03;        // 전설 카드 확률
 const PITY_LIMIT = 10;             // 천장: 이 횟수만큼 연속 일반이면 희귀 이상 보장
@@ -342,9 +436,9 @@ const AOE_SPLIT = 5;               // 범위 공격이 이 수보다 많이 맞�
 const ELITE_AOE_RES = 0.65;        // 정예가 받는 범위 피해 배율 (0.65 = 35% 감소)
 const SHIELD_AOE_RES = 0.4;        // 방패병이 받는 범위 피해 배율 (0.4 = 60% 감소)
 const FLY_BONUS = 0.3;             // 궁수가 나는 적에게 주는 추가 피해
-const LATE_WAVE = 18;              // 이 웨이브부터 적 체력이 가파르게 증가
+const LATE_WAVE = 17;              // 이 웨이브부터 적 체력이 가파르게 증가
 const LATE_HP_MUL = 1.12;          // 후반 웨이브마다 적 체력 배율
-const STORE_KEY = "tiny-castle-defense-records-v6";
+const STORE_KEY = "tiny-castle-defense-records-v7";
 const SOUND_KEY = "tiny-castle-defense-sound";
 const MAX_ENEMIES = 220;           // 화면 위 적 수 상한 (성능 보호)
 const RUSH_WARN = 2;               // 러시 예고 시간(초)
@@ -356,7 +450,7 @@ const RUSH_START = 9;              // 웨이브 시작 후 러시가 시작되�
        아래 따옴표 안에 붙여 넣으세요. 비워 두면 랭킹 없이 게임만 동작합니다. ▼▼▼
    ========================================================= */
 const RANKING_URL = "https://script.google.com/macros/s/AKfycbyWIXQIlylvhmHc-hFl4PcmIt3UJgyvfwKJ8C0aCn_qtEy14dWVowopCGwarzz6pTal/exec";
-const GAME_VERSION = "v6";         // 버전이 바뀌면 랭킹이 따로 집계됩니다.
+const GAME_VERSION = "v7";         // 버전이 바뀌면 랭킹이 따로 집계됩니다.
 
 /*
   아군 병기
@@ -364,23 +458,26 @@ const GAME_VERSION = "v6";         // 버전이 바뀌면 랭킹이 따로 집�
   maxCount: 병사 최대 수, maxSpd: 공격속도 강화 최대 단계 (각성하면 한계 상승)
 */
 const TYPES = {
+  sword:    { name: "검사", icon: "⚔️", mode: "melee", damage: 25, interval: 1.2, speed: 0, range: 110,
+              radius: 0, maxCount: 3, maxSpd: 6, color: "#f8fafc", rowY: 58,
+              desc: "성 앞 110px 반달 안의 모든 적을 벰. 범위 피해 분산·정예 저항을 받지 않음" },
   archer:   { name: "궁수", icon: "🏹", mode: "single", damage: 11, interval: 0.75, speed: 700, range: 860,
-              radius: 0, maxCount: 4, maxSpd: 6, color: "#fde68a", rowY: 84,
+              radius: 0, maxCount: 4, maxSpd: 6, color: "#fde68a", rowY: 116,
               desc: "잡몹에 강함. 적을 잡으면 남은 피해로 다음 적 공격, 나는 적에게 피해 +30%" },
   spear:    { name: "창투척병", icon: "🔱", mode: "line", damage: 20, interval: 1.6, speed: 620, range: 360,
-              radius: 0, maxCount: 3, maxSpd: 6, color: "#7dd3fc", rowY: 148, pierce: 3,
+              radius: 0, maxCount: 3, maxSpd: 6, color: "#7dd3fc", rowY: 174, pierce: 3,
               desc: "정예·보스에 강함. 사거리는 짧지만 3마리 관통, 정예·보스 피해 +40%" },
   fire:     { name: "화염병투척병", icon: "🔥", mode: "aoe", damage: 8, interval: 2.4, speed: 420, range: 640,
-              radius: 60, maxCount: 3, maxSpd: 6, color: "#fb923c", rowY: 212, burn: 13, burnTime: 3,
-              desc: "약한 범위 공격 + 3초 불길 (불길은 방어력·정예 범위 저항 무시)" },
+              radius: 60, maxCount: 3, maxSpd: 6, color: "#fb923c", rowY: 232, burn: 13, burnTime: 3,
+              desc: "약한 범위 공격 + 3초 불길. 직접 적중할 때 화상 중첩(최대 5)" },
   ice:      { name: "얼음술사", icon: "❄️", mode: "aoe", damage: 18, interval: 1.8, speed: 450, range: 640,
-              radius: 70, maxCount: 3, maxSpd: 6, color: "#a5f3fc", rowY: 276, slow: 0.4, slowTime: 2,
+              radius: 70, maxCount: 3, maxSpd: 6, color: "#a5f3fc", rowY: 290, slow: 0.4, slowTime: 2,
               desc: "범위 둔화 40% + 냉기(받는 피해 +20%). 나는 적도 맞힘" },
   ballista: { name: "발리스타", icon: "🎯", mode: "bolt", damage: 28, interval: 3.5, speed: 900, range: 860,
-              radius: 0, maxCount: 2, maxSpd: 5, color: "#fca5a5", rowY: 340, pierce: 999, falloff: 0.12,
+              radius: 0, maxCount: 2, maxSpd: 5, color: "#fca5a5", rowY: 348, pierce: 999, falloff: 0.12,
               desc: "한 줄을 끝까지 관통 (맞힐 때마다 -12%, 최소 20%)" },
   cannon:   { name: "대포", icon: "💣", mode: "aoe", damage: 68, interval: 3.45, speed: 380, range: 860,
-              radius: 80, maxCount: 3, maxSpd: 6, color: "#c4b5fd", rowY: 404,
+              radius: 80, maxCount: 3, maxSpd: 6, color: "#c4b5fd", rowY: 406,
               desc: "느리지만 강력한 범위 폭발" }
 };
 
@@ -389,6 +486,13 @@ const TYPES = {
   mod 함수가 병기의 능력치 객체(m)를 바꿉니다.
 */
 const TRAITS = {
+  sword: [
+    { id: "longBlade", name: "긴 칼날", desc: "베기 범위 +30%", mod: m => { m.range *= 1.3; } },
+    { id: "dual", name: "쌍검", desc: "0.2초 뒤 공격력 80%로 한 번 더 벰", mod: m => { m.doubleSlash = 1; } },
+    { id: "armorBreak", name: "갑옷 가르기", desc: "방어력 5 무시, 맞은 적 방어력 5초간 -3", mod: m => { m.armorPen += 5; m.armorBreak = 3; } },
+    { id: "lifesteal", name: "흡혈", desc: "검사로 처치 시 성 최대 HP의 0.4% 회복", mod: m => { m.lifeSteal = 0.004; } },
+    { id: "counter", name: "반격 자세", desc: "성이 피해를 받으면 분노(최대 3), 다음 베기 피해 증가", mod: m => { m.counter = true; } }
+  ],
   archer: [
     { id: "multi",  name: "다중 사격", desc: "한 번에 화살 +1발 (다른 적 조준)", mod: m => { m.multi += 1; } },
     { id: "poison", name: "독화살", desc: "명중 시 3초간 초당 공격력 40% 독 (방어 무시)", mod: m => { m.poison += 0.4; } },
@@ -426,7 +530,7 @@ const TRAITS = {
   ],
   cannon: [
     { id: "caliber",  name: "대구경", desc: "폭발 범위 ×1.35", mod: m => { m.radius *= 1.35; } },
-    { id: "incend",   name: "소이탄", desc: "폭발 자리에 3초 불길", mod: m => { m.incend = true; } },
+    { id: "powder",   name: "강화 화약", desc: "공격력 ×1.15", mod: m => { m.dmg *= 1.15; } },
     { id: "shrapnel", name: "파편", desc: "폭발 후 소형 폭탄 3개 분열", mod: m => { m.split = Math.max(m.split, 3); } },
     { id: "reload",   name: "장전 숙련", desc: "공격속도 ×1.3", mod: m => { m.spd *= 1.3; } },
     { id: "shock",    name: "충격파", desc: "폭발 시 적을 25px 밀어냄", mod: m => { m.knock = Math.max(m.knock, 25); } }
@@ -434,6 +538,13 @@ const TRAITS = {
 };
 
 const EVOS = {
+  sword: [
+    { id: "bladeStorm", name: "칼날 폭풍", need: ["longBlade", "dual"], desc: "베기 범위 ×1.2, 추가 베기 피해 100%", mod: m => { m.range *= 1.2; m.doubleSlash = 1; } },
+    { id: "swordAura", name: "검기", need: ["longBlade", "armorBreak"], desc: "베기 끝에서 220px 검기 1개 발사, 공격력 65%", mod: m => { m.swordWave = 1; m.waveRange = 220; m.waveMul = 0.65; } },
+    { id: "bloodFeast", name: "피의 축제", need: ["dual", "lifesteal"], desc: "추가 베기 피해 100%, 처치 회복 0.8%", mod: m => { m.doubleSlash = 1; m.lifeSteal = 0.008; } },
+    { id: "indomitable", name: "불굴", need: ["lifesteal", "counter"], desc: "분노 피해 증가 강화, 처치 회복 0.6%", mod: m => { m.counterMul = 0.5; m.lifeSteal = Math.max(m.lifeSteal, 0.006); } },
+    { id: "iai", name: "일섬", need: ["armorBreak", "counter"], desc: "방어력 12 무시, 분노가 있으면 치명타", mod: m => { m.armorPen += 7; m.iai = true; } }
+  ],
   archer: [
     { id: "rain",    name: "화살비", need: ["multi", "pierce"], desc: "화살 +2발, 튕김 +1", mod: m => { m.multi += 2; m.chain += 1; } },
     { id: "venom",   name: "맹독 저격", need: ["poison", "aim"], desc: "치명타 시 독 3배, 치명타 +25%, 독 +120%, 화살 +1발", mod: m => { m.poisonCrit = 3; m.crit += 0.25; m.poison += 1.2; m.multi += 1; } },
@@ -471,7 +582,7 @@ const EVOS = {
   ],
   cannon: [
     { id: "cluster",  name: "집속탄", need: ["shrapnel", "caliber"], desc: "소형 폭탄 7개로 분열", mod: m => { m.split = 7; } },
-    { id: "napalmS",  name: "네이팜 포격", need: ["incend", "caliber"], desc: "불길 피해 ×2.5, 범위 ×1.2", mod: m => { m.incend = true; m.incendMul *= 2.5; m.radius *= 1.2; } },
+    { id: "heavyShell", name: "초대형 포탄", need: ["powder", "caliber"], desc: "공격력 ×1.35, 범위 ×1.2", mod: m => { m.dmg *= 1.35; m.radius *= 1.2; } },
     { id: "barrage",  name: "연속 포격", need: ["shock", "reload"], desc: "포탄 +1발, 공격속도 ×1.2", mod: m => { m.multi += 1; m.spd *= 1.2; } },
     { id: "siegeGun", name: "공성포", need: ["caliber", "reload"], desc: "공격력 ×1.8, 보스 피해 ×1.5", mod: m => { m.dmg *= 1.8; m.bossMul *= 1.5; } },
     { id: "frag",     name: "파쇄탄", need: ["shrapnel", "shock"], desc: "방어력 15 무시, 분열 5개", mod: m => { m.armorPen += 15; m.split = Math.max(m.split, 5); } }
@@ -484,12 +595,16 @@ const EVOS = {
   aura: 성 위 병기 칸과 투사체에 쓰는 각성 색
 */
 const AWAKENS = {
+  sword: [
+    { id: "swordSaint", name: "검성", aura: "#f8fafc", desc: "베기마다 사거리 250px 검기 3갈래\n각 검기는 공격력 45%", mod: m => { m.swordSaint = true; m.waveRange = 250; m.waveMul = 0.45; } },
+    { id: "guardian", name: "철벽 수문장", aura: "#60a5fa", desc: "6초마다 성 앞 적을 130px 선까지 밀어냄\n보스 면역, 골렘은 20px만 밀림", mod: m => { m.guardian = true; } }
+  ],
   archer: [
-    { id: "stormArcher", name: "폭풍의 궁수", aura: "#fbbf24", desc: "화살 +1발, 튕김 +2, 공격력 ×1.2\n남은 피해 이어가기 60%", mod: m => { m.multi += 1; m.chain += 2; m.dmg *= 1.2; m.carry = 0.6; } },
-    { id: "shadow",      name: "그림자 사수", aura: "#a855f7", desc: "6번째 공격마다 그림자 화살 발사\n(한 줄 무한 관통, 공격력 ×4 + 최대 체력 2%)", mod: m => { m.shadow = true; } }
+    { id: "stormArcher", name: "폭풍의 궁수", aura: "#fbbf24", desc: "화살 +1발, 튕김 +2, 공격력 ×1.3\n남은 피해 이어가기 60%", mod: m => { m.multi += 1; m.chain += 2; m.dmg *= 1.3; m.carry = 0.6; } },
+    { id: "shadow",      name: "그림자 사수", aura: "#a855f7", desc: "6번째 공격마다 그림자 화살 발사\n(한 줄 무한 관통, 공격력 ×2.8 + 최대 체력 1.0%)", mod: m => { m.shadow = true; } }
   ],
   spear: [
-    { id: "dragoon",     name: "용기병", aura: "#22d3ee", desc: "관통 +6, 공격력 ×1.5\n정예·보스 피해 추가 +60%", mod: m => { m.pierce += 6; m.dmg *= 1.5; m.eliteMul += 0.6; m.lineW = 14; } },
+    { id: "dragoon",     name: "용기병", aura: "#22d3ee", desc: "모든 창병이 보스를 최우선 공격\n관통 +6, 공격력 ×1.5, 정예·보스 피해 추가 +60%", mod: m => { m.pierce += 6; m.dmg *= 1.5; m.eliteMul += 0.6; m.lineW = 14; m.bossFocus = true; } },
     { id: "thunderLord", name: "뇌신창", aura: "#facc15", desc: "창이 맞힐 때마다 번개가 주변 적 3명에게\n연쇄 (공격력 50%)", mod: m => { m.lightning = 3; } }
   ],
   fire: [
@@ -498,25 +613,26 @@ const AWAKENS = {
   ],
   ice: [
     { id: "absZero",     name: "절대영도", aura: "#67e8f9", desc: "9초마다 전장 전체를 얼림\n(보스 외 1.5초 정지 + 공격력 ×5 피해)", mod: m => { m.zero = true; } },
-    { id: "glacier",     name: "빙하 창기사", aura: "#38bdf8", desc: "무한 관통 얼음 창으로 변경\n공격력 ×2.5, 냉기 피해 증가 +40%", mod: m => { m.line = true; m.pierce = 999; m.dmg *= 2.5; m.brittle += 0.4; m.lineW = 12; } }
+    { id: "glacier",     name: "빙하 창기사", aura: "#38bdf8", desc: "무한 관통 얼음 창으로 변경\n공격력 ×2.1, 냉기 피해 증가 +20%", mod: m => { m.line = true; m.pierce = 999; m.dmg *= 2.1; m.brittle += 0.2; m.lineW = 12; } }
   ],
   ballista: [
-    { id: "railgun",     name: "레일건", aura: "#e879f9", desc: "순식간에 화면을 꿰뚫는 광선\n공격력 ×1.8, 판정 폭 4배, 관통 감소 6%", mod: m => { m.dmg *= 1.8; m.boltW = 30; m.falloff = Math.min(m.falloff, 0.06); m.boltSpeed = 3200; } },
-    { id: "burstBolt",   name: "폭뢰 쇠뇌", aura: "#fb7185", desc: "볼트가 맞힐 때마다 폭발\n(반경 50, 공격력 35%)", mod: m => { m.boltBlast = 0.35; } }
+    { id: "railgun",     name: "레일건", aura: "#e879f9", desc: "순식간에 화면을 꿰뚫는 광선\n공격력 ×1.9, 판정 폭 4배, 관통 감소 6%", mod: m => { m.dmg *= 1.9; m.boltW = 30; m.falloff = Math.min(m.falloff, 0.06); m.boltSpeed = 3200; } },
+    { id: "burstBolt",   name: "폭뢰 쇠뇌", aura: "#fb7185", desc: "볼트가 맞힐 때마다 폭발\n(반경 50, 공격력 37%)", mod: m => { m.boltBlast = 0.37; } }
   ],
   cannon: [
     { id: "meteor",      name: "궤도 포격", aura: "#fde047", desc: "3번째 포격마다 운석 낙하\n(범위 ×2.2, 공격력 ×3.5)", mod: m => { m.meteor = true; } },
-    { id: "artillery",   name: "자주포 부대", aura: "#a3e635", desc: "포탄 +2발, 공격속도 ×1.35", mod: m => { m.multi += 2; m.spd *= 1.35; } }
+    { id: "artillery",   name: "자주포 부대", aura: "#a3e635", desc: "포탄 +2발, 공격속도 ×1.35, 공격력 ×1.05", mod: m => { m.multi += 2; m.spd *= 1.35; m.dmg *= 1.05; } }
   ]
 };
 
 // 성 강화(공용) 스킬
 const PERKS = {
-  repair: { icon: "🧱", name: "성벽 보수", max: 99, desc: () => `HP ${Math.round(g.maxHp * 0.4)} 즉시 회복 + 최대 HP +60` },
-  fort:   { icon: "🛡️", name: "철벽", max: 5, desc: lv => `성이 받는 피해 감소 ${lv * 10}% → ${(lv + 1) * 10}%` },
-  regen:  { icon: "🔧", name: "수리공", max: 4, desc: lv => `초당 HP 회복 ${lv * 1.5} → ${(lv + 1) * 1.5}` },
-  crit:   { icon: "💥", name: "정밀 조준", max: 6, desc: lv => `모든 공격 치명타 확률 ${lv * 5}% → ${(lv + 1) * 5}%` },
-  study:  { icon: "📚", name: "전술 연구", max: 4, desc: lv => `경험치 획득 +${lv * 15}% → +${(lv + 1) * 15}%` }
+  expansion: { icon: "🧱", name: "증축", max: 5, desc: lv => `성 최대 HP +100 (${500 + lv * 100} → ${600 + lv * 100})` },
+  fort:      { icon: "🛡️", name: "요새화", max: 5, desc: lv => `성이 받는 피해 감소 ${lv * 10}% → ${(lv + 1) * 10}%` },
+  thorns:    { icon: "🌵", name: "가시 성벽", max: 5, desc: lv => `성을 때린 적 반사 피해 Lv${lv} → Lv${lv + 1}` },
+  emergency: { icon: "🔧", name: "긴급 수리", max: 99, desc: () => "성 HP 40% 즉시 회복" },
+  crit:      { icon: "💥", name: "정밀 조준", max: 6, desc: lv => `모든 공격 치명타 확률 ${lv * 5}% → ${(lv + 1) * 5}%` },
+  study:     { icon: "📚", name: "전술 연구", max: 4, desc: lv => `경험치 획득 +${lv * 15}% → +${(lv + 1) * 15}%` }
 };
 
 /*
@@ -531,7 +647,7 @@ const ENEMIES = {
   bat:    { hp: 9,   speed: 72, dmg: 2,  xp: 0.65, r: 9,  armor: 0, color: "#4c1d95", flying: true, icon: "🦇" },
   shield: { hp: 55,  speed: 32, dmg: 6,  xp: 2,    r: 15, armor: 3, color: "#92400e", elite: true, aoeRes: SHIELD_AOE_RES, knockRes: 0.5, icon: "🛡️" },
   knight: { hp: 55,  speed: 34, dmg: 6,  xp: 2,    r: 15, armor: 6, color: "#64748b", elite: true, knockRes: 0.5 },
-  golem:  { hp: 340, speed: 18, dmg: 20, xp: 8,    r: 24, armor: 9, color: "#78716c", elite: true, knockRes: 0, burnRes: 0.5, icon: "🪨" }
+  golem:  { hp: 340, speed: 18, dmg: 20, xp: 8,    r: 24, armor: 9, color: "#78716c", elite: true, knockRes: 0, burnRes: 1, icon: "🪨" }
 };
 
 /*
@@ -680,20 +796,209 @@ function saveRecords() {
 }
 /* =========================================================
    2-1. 온라인 랭킹 (Google Apps Script 서버와 통신)
-   - 조회: GET  RANKING_URL?action=top&version=v6&nick=닉네임
+   - 조회: GET  RANKING_URL?action=top&version=v7&nick=닉네임
    - 등록: POST RANKING_URL  (JSON 본문, text/plain으로 보내 CORS 사전 요청을 피함)
    ========================================================= */
 const NICK_KEY = "tiny-castle-nick";
 const PIN_KEY = "tiny-castle-pin";
 const RANK_HINT = "처음 쓰는 닉네임이면 지금 입력한 PIN으로 등록됩니다. 실제로 쓰는 비밀번호는 넣지 마세요.";
-let rankTab = "all";       // "all"(전체 TOP 3) / "today"(오늘 TOP 10) / "hall"(지난 시즌 명예의 전당)
-const HALL_VERSION = "v5"; // 명예의 전당으로 보여 줄 지난 버전
-let hallData = null;       // 지난 버전 전체 TOP 3
+let rankTab = "all";       // "all"(전체 TOP 3) / "today"(오늘 TOP 10) / "hall"(시즌 명예의 전당)
+const HALL_VERSIONS = ["v6", "v5"]; // 새 시즌이 나오면 맨 앞에 시즌 이름만 추가
+let hallData = {};         // 시즌별 전체 TOP 3
+let hallLoading = false;
 let rankData = null;
 let rankLoading = false;
 let lastResult = null;
 let submitted = false;
 const rankEnabled = () => /^https:\/\//.test(RANKING_URL);
+const COLLECTION_CACHE = "tiny-castle-card-codex-v7";
+let collectionSeen = new Set();
+let codexFilter = "all";
+let codexLoading = false;
+function collectionId(c) {
+  const prefix = { trait: "T", evo: "E", awaken: "A" }[c.kind];
+  return prefix ? `${prefix}-${c.key}-${c.id}` : "";
+}
+function knownCardIds() {
+  const ids = new Set();
+  for (const key of Object.keys(TYPES)) {
+    TRAITS[key].forEach(x => ids.add(`T-${key}-${x.id}`));
+    EVOS[key].forEach(x => ids.add(`E-${key}-${x.id}`));
+    AWAKENS[key].forEach(x => ids.add(`A-${key}-${x.id}`));
+  }
+  return ids;
+}
+// 밸런스 분석용 카드 ID. 도감 84장 외에도 기본 강화·병력·성 강화 카드까지 기록합니다.
+function telemetryCardId(c) {
+  if (!c) return "";
+  const codex = collectionId(c);
+  if (codex) return codex;
+  const prefix = { new: "N", count: "C", damage: "D", speed: "S", perk: "P" }[c.kind];
+  return prefix ? `${prefix}-${c.key}` : "";
+}
+function telemetryCardMeta(c) {
+  const weapon = TYPES[c.key];
+  if (c.kind === "trait") return { name: TRAITS[c.key].find(x => x.id === c.id).name, weapon: c.key };
+  if (c.kind === "evo") return { name: EVOS[c.key].find(x => x.id === c.id).name, weapon: c.key };
+  if (c.kind === "awaken") return { name: AWAKENS[c.key].find(x => x.id === c.id).name, weapon: c.key };
+  if (c.kind === "perk") return { name: PERKS[c.key].name, weapon: "" };
+  const suffix = { new: "획득", count: "병력 증가", damage: "공격력 강화", speed: "공격속도 강화" }[c.kind] || c.kind;
+  return { name: weapon ? `${weapon.name} ${suffix}` : suffix, weapon: c.key || "" };
+}
+function allTelemetryCardIds() {
+  const ids = knownCardIds();
+  for (const key of Object.keys(TYPES)) for (const p of ["N", "C", "D", "S"]) ids.add(`${p}-${key}`);
+  for (const key of Object.keys(PERKS)) ids.add(`P-${key}`);
+  return ids;
+}
+function recordCardOffers(cards) {
+  if (!g) return;
+  g.cardRolls += 1;
+  for (const c of cards) {
+    const id = telemetryCardId(c);
+    if (!id) continue;
+    const meta = telemetryCardMeta(c);
+    const row = g.cardOffers[id] || { kind: c.kind, weapon: meta.weapon, name: meta.name, shown: 0, picked: 0 };
+    row.shown += 1;
+    g.cardOffers[id] = row;
+  }
+}
+function recordCardPick(c) {
+  const id = telemetryCardId(c);
+  if (!id || !g) return;
+  if (!g.cardOffers[id]) {
+    const meta = telemetryCardMeta(c);
+    g.cardOffers[id] = { kind: c.kind, weapon: meta.weapon, name: meta.name, shown: 1, picked: 0 };
+  }
+  g.cardOffers[id].picked += 1;
+}
+function buildTelemetry() {
+  const round1 = n => Math.round((Number(n) || 0) * 10) / 10;
+  const weaponTotal = Object.keys(TYPES).reduce((sum, key) => sum + (g.dmgBy[key] || 0), 0);
+  const weapons = {};
+  for (const [key, t] of Object.entries(TYPES)) {
+    const u = g.units[key], damage = Math.max(0, Math.round(g.dmgBy[key] || 0));
+    const evo = u.evo ? EVOS[key].find(x => x.id === u.evo) : null;
+    const awaken = u.awaken ? AWAKENS[key].find(x => x.id === u.awaken) : null;
+    weapons[key] = {
+      name: t.name,
+      damage,
+      damagePct: weaponTotal ? Math.round(damage / weaponTotal * 10000) / 100 : 0,
+      soldiers: u.count,
+      damageLevel: u.dmgLv,
+      speedLevel: u.spdLv,
+      traits: [...u.traits].map(id => ({ id, name: TRAITS[key].find(x => x.id === id).name })),
+      evolution: evo ? { id: evo.id, name: evo.name } : null,
+      awakening: awaken ? { id: awaken.id, name: awaken.name, wave: u.awakenWave } : null
+    };
+  }
+  const offered = {};
+  for (const id of Object.keys(g.cardOffers).sort()) {
+    const row = g.cardOffers[id];
+    offered[id] = { ...row, notPicked: Math.max(0, row.shown - row.picked) };
+  }
+  const appeared = Object.keys(offered);
+  const aliveBosses = g.enemies.filter(e => e.boss && !e.dead).map(e => ({
+    id: e.boss.def.id, name: e.boss.def.name, wave: g.wave,
+    hp: Math.max(0, Math.round(e.hp)), maxHp: Math.round(e.maxHp), hpPct: Math.round(Math.max(0, e.hp) / e.maxHp * 1000) / 10,
+    spawnTime: g.bossSpawns[e.boss.telemetryIndex] ? g.bossSpawns[e.boss.telemetryIndex].spawnTime : null
+  }));
+  return {
+    schema: 1,
+    gameVersion: GAME_VERSION,
+    result: { time: round1(g.time), wave: g.wave, kills: g.kills, level: g.level },
+    weapons,
+    castle: { levels: { ...g.perks }, hp: round1(g.hp), maxHp: g.maxHp },
+    rerolls: { used: g.rerollsUsed, remaining: g.rerolls },
+    bosses: { spawns: g.bossSpawns, kills: g.bossKills, death: { wave: g.wave, time: round1(g.time), alive: aliveBosses } },
+    cards: {
+      rolls: g.cardRolls,
+      byId: offered,
+      appeared,
+      shownNotPicked: appeared.filter(id => offered[id].notPicked > 0),
+      neverShown: [...allTelemetryCardIds()].filter(id => !g.cardOffers[id]).sort(),
+      codexDiscoveredThisRun: [...g.discoveredThisRun].sort()
+    }
+  };
+}
+function mergeCollection(values) {
+  const known = knownCardIds();
+  for (const id of Array.isArray(values) ? values : []) if (known.has(String(id))) collectionSeen.add(String(id));
+  try { localStorage.setItem(COLLECTION_CACHE, JSON.stringify([...collectionSeen])); } catch { /* 서버가 기준, 캐시는 보조 */ }
+}
+function loadCollectionCache() {
+  try { mergeCollection(JSON.parse(localStorage.getItem(COLLECTION_CACHE) || "[]")); } catch { /* 무시 */ }
+}
+function discoverVisibleCards(cards) {
+  if (!g) return;
+  for (const c of cards) {
+    const id = collectionId(c);
+    if (!id) continue;
+    collectionSeen.add(id);
+    g.discoveredThisRun.add(id); // 선택 여부와 무관하게 '카드가 뜬 순간' 등록
+  }
+  try { localStorage.setItem(COLLECTION_CACHE, JSON.stringify([...collectionSeen])); } catch { /* 무시 */ }
+  if (!$('codexModal').hidden) renderCodex();
+}
+function codexCondition(kind, key, item) {
+  if (kind === "trait") return `조건: ${TYPES[key].name} 보유 + 기본 강화 합계 2 · 특성 최대 ${TRAIT_CAP}개`;
+  if (kind === "evo") {
+    const names = item.need.map(id => TRAITS[key].find(t => t.id === id).name).join(" + ");
+    return `조건: 특성 ${names}`;
+  }
+  if (key === "sword" && item.id === "guardian") return "조건: 진화 1개 + 특성 4개 + 공격속도 Lv3 + 공격력 Lv2";
+  return "조건: 진화 1개 + 특성 4개 + 공격력 Lv5";
+}
+function codexItems() {
+  const out=[];
+  for (const [key,t] of Object.entries(TYPES)) {
+    TRAITS[key].forEach(x => out.push({kind:"trait",key,item:x,id:`T-${key}-${x.id}`,weapon:t}));
+    EVOS[key].forEach(x => out.push({kind:"evo",key,item:x,id:`E-${key}-${x.id}`,weapon:t}));
+    AWAKENS[key].forEach(x => out.push({kind:"awaken",key,item:x,id:`A-${key}-${x.id}`,weapon:t}));
+  }
+  return out;
+}
+function renderCodex() {
+  const all=codexItems(), shown=codexFilter === "all" ? all : all.filter(x => x.kind === codexFilter);
+  const got=all.filter(x => collectionSeen.has(x.id)).length;
+  $("codexSummary").textContent = `등록 ${got} / ${all.length} · 특성/진화/각성 카드가 선택지에 실제로 뜨면 등록됩니다.`;
+  document.querySelectorAll("[data-codex]").forEach(b => b.classList.toggle("active", b.dataset.codex === codexFilter));
+  const root=$("codexGroups"); root.replaceChildren();
+  for (const [key,t] of Object.entries(TYPES)) {
+    const list=shown.filter(x => x.key === key); if (!list.length) continue;
+    const sec=document.createElement("section"); sec.className="codex-group";
+    const h=document.createElement("h3"); h.textContent=`${t.icon} ${t.name}`;
+    const grid=document.createElement("div"); grid.className="codex-grid";
+    for (const x of list) {
+      const open=collectionSeen.has(x.id), card=document.createElement("article");
+      card.className="codex-card"+(open?"":" locked");
+      const strong=document.createElement("strong");
+      const labels={trait:"특성",evo:"진화",awaken:"각성"};
+      strong.textContent=open?`${labels[x.kind]} · ${x.item.name}`:`🔒 ${labels[x.kind]} · ???`;
+      const cond=document.createElement("small"); cond.textContent=open?codexCondition(x.kind,x.key,x.item):"카드가 등장하면 조건과 강화 내용 공개";
+      const desc=document.createElement("span"); desc.textContent=open?x.item.desc:"아직 발견하지 못했습니다.";
+      card.append(strong,cond,desc); grid.appendChild(card);
+    }
+    sec.append(h,grid); root.appendChild(sec);
+  }
+}
+async function loadCollectionFromServer() {
+  const nick=getSaved(NICK_KEY), pin=getSaved(PIN_KEY);
+  if (!rankEnabled() || !nick || !/^\d{4}$/.test(pin)) {
+    $("codexStatus").textContent="닉네임과 PIN으로 기록을 한 번 등록하면 서버 도감을 불러올 수 있습니다."; return;
+  }
+  if (codexLoading) return;
+  codexLoading=true; $("codexStatus").textContent="서버 도감 불러오는 중…";
+  try {
+    const data=await rankFetch(RANKING_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"col_get",nick,pin})});
+    if (data && data.ok) { mergeCollection(data.collection); $("codexStatus").textContent=`${nick}님의 서버 도감을 불러왔습니다.`; renderCodex(); }
+    else $("codexStatus").textContent=(data&&data.msg)||"서버 도감을 불러오지 못했습니다.";
+  } catch { $("codexStatus").textContent="서버 도감에 연결하지 못했습니다."; }
+  codexLoading=false;
+}
+function openCodex(){ $("codexModal").hidden=false; document.body.classList.add("codex-open"); renderCodex(); loadCollectionFromServer(); }
+function closeCodex(){ $("codexModal").hidden=true; document.body.classList.remove("codex-open"); }
+
 function getSaved(key) {
   try { return localStorage.getItem(key) || ""; } catch { return ""; }
 }
@@ -726,15 +1031,23 @@ async function loadRanking() {
   rankLoading = false;
   renderRankBoards();
 }
-// 명예의 전당: 지난 버전(v5)의 전체 TOP 3를 읽기 전용으로 불러옴 (서버 변경 없이 version만 바꿔 조회)
-async function loadHall() {
-  if (!rankEnabled()) return;
-  try {
-    const data = await rankFetch(`${RANKING_URL}?action=top&version=${encodeURIComponent(HALL_VERSION)}`);
-    hallData = data && data.ok ? data : { error: (data && data.msg) || "명예의 전당을 불러오지 못했습니다." };
-  } catch {
-    hallData = { error: "랭킹 서버에 연결하지 못했습니다." };
-  }
+// 명예의 전당: 등록된 모든 시즌의 TOP 3를 한꺼번에 읽기 전용으로 불러옴
+// (서버 변경 없이 version만 바꿔 조회)
+async function loadHall(force = false) {
+  if (!rankEnabled() || hallLoading) return;
+  if (!force && HALL_VERSIONS.every(version => hallData[version])) return;
+  hallLoading = true;
+  renderRankBoards();
+  const results = await Promise.all(HALL_VERSIONS.map(async version => {
+    try {
+      const data = await rankFetch(`${RANKING_URL}?action=top&version=${encodeURIComponent(version)}`);
+      return [version, data && data.ok ? data : { error: (data && data.msg) || "명예의 전당을 불러오지 못했습니다." }];
+    } catch {
+      return [version, { error: "랭킹 서버에 연결하지 못했습니다." }];
+    }
+  }));
+  hallData = Object.fromEntries(results);
+  hallLoading = false;
   renderRankBoards();
 }
 function formatClock(sec) {
@@ -757,7 +1070,10 @@ function rankRow(e, pos, tab, myNick) {
   p.textContent = ["🥇", "🥈", "🥉"][pos - 1] || pos;
   const nick = document.createElement("span");
   nick.className = "nick";
-  nick.textContent = e.nick;
+  const nickName = document.createElement("span");
+  nickName.className = "nick-name";
+  nickName.textContent = e.nick;
+  nick.append(nickName, ...titleBadges(e.titles));
   const time = document.createElement("span");
   time.className = "time";
   time.textContent = formatClock(e.time);
@@ -776,6 +1092,19 @@ function rankRow(e, pos, tab, myNick) {
   }
   row.append(p, nick, time, meta);
   return row;
+}
+// 칭호 뱃지: 서버가 보내 준 titles([{ v: "v5", r: 1 }])를 뱃지로 만듦
+// 1위 = 👑 패왕(금색, 반짝임) / 2위 = 🥈 2위(은색) / 3위 = 🥉 3위(동색)
+const TITLE_NAMES = { 1: ["👑", "패왕"], 2: ["🥈", "2위"], 3: ["🥉", "3위"] };
+function titleBadges(titles) {
+  if (!Array.isArray(titles)) return [];
+  return titles.filter(x => TITLE_NAMES[x.r]).slice(0, 5).map(x => {
+    const [icon, name] = TITLE_NAMES[x.r];
+    const b = document.createElement("span");
+    b.className = "title-badge r" + x.r;
+    b.textContent = `${icon} ${String(x.v || "")} ${name}`;
+    return b;
+  });
 }
 function rankNote(text, strong) {
   const note = document.createElement("div");
@@ -825,22 +1154,33 @@ function renderRankBoards() {
     }
   }
 }
-// 명예의 전당 표시 (지난 버전 TOP 3, 더 이상 바뀌지 않음)
+// 명예의 전당 표시 (v5부터 시즌별 TOP 3를 최신순으로 모두 표시)
 function renderHall(box) {
-  const head = document.createElement("div");
-  head.className = "hall-head";
-  head.textContent = `🏛️ ${HALL_VERSION} 시즌 명예의 전당`;
-  const sub = document.createElement("small");
-  sub.textContent = "지난 시즌 최종 TOP 3 · 기록은 더 이상 바뀌지 않습니다";
-  head.appendChild(sub);
-  box.appendChild(head);
-  if (!hallData) { box.appendChild(rankNote("명예의 전당 불러오는 중…")); return; }
-  if (hallData.error) { box.appendChild(rankNote(hallData.error)); return; }
-  if (!hallData.all || !hallData.all.length) { box.appendChild(rankNote("기록이 없습니다.")); return; }
-  const wrap = document.createElement("div");
-  wrap.className = "rank-list";
-  hallData.all.slice(0, 3).forEach((e, i) => wrap.appendChild(rankRow(e, i + 1, "all", "")));
-  box.appendChild(wrap);
+  HALL_VERSIONS.forEach(version => {
+    const season = document.createElement("section");
+    season.className = "hall-season";
+    const head = document.createElement("div");
+    head.className = "hall-head";
+    head.textContent = `🏛️ ${version} 시즌 명예의 전당`;
+    const sub = document.createElement("small");
+    sub.textContent = "시즌 최종 TOP 3 · 기록은 더 이상 바뀌지 않습니다";
+    head.appendChild(sub);
+    season.appendChild(head);
+    const data = hallData[version];
+    if (!data) {
+      season.appendChild(rankNote(hallLoading ? "명예의 전당 불러오는 중…" : "명예의 전당을 불러오지 못했습니다."));
+    } else if (data.error) {
+      season.appendChild(rankNote(data.error));
+    } else if (!data.all || !data.all.length) {
+      season.appendChild(rankNote("기록이 없습니다."));
+    } else {
+      const wrap = document.createElement("div");
+      wrap.className = "rank-list";
+      data.all.slice(0, 3).forEach((e, i) => wrap.appendChild(rankRow(e, i + 1, "all", "")));
+      season.appendChild(wrap);
+    }
+    box.appendChild(season);
+  });
 }
 // 이번 판 결과 정리 (최고 딜 병기 포함, 진화/각성 이름 표시)
 function prepareResult() {
@@ -855,7 +1195,7 @@ function prepareResult() {
       dmg: Math.round(v), pct: Math.round(v / total * 100)
     };
   }
-  lastResult = { time: Math.round(g.time * 10) / 10, wave: g.wave, kills: g.kills, level: g.level, weapon };
+  lastResult = { time: Math.round(g.time * 10) / 10, wave: g.wave, kills: g.kills, level: g.level, weapon, telemetry: buildTelemetry() };
   submitted = false;
 }
 function setRankStatus(text, type) {
@@ -882,13 +1222,14 @@ async function submitRank() {
     const data = await rankFetch(RANKING_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "submit", version: GAME_VERSION, nick, pin, ...lastResult })
+      body: JSON.stringify({ action: "submit", version: GAME_VERSION, nick, pin, ...lastResult, combos: [...g.discoveredThisRun] })
     });
     if (data && data.ok) {
       submitted = true;
       setSaved(NICK_KEY, nick);
       setSaved(PIN_KEY, pin);
       rankData = data;
+      mergeCollection(data.collection);
       const a = data.me && data.me.all, t = data.me && data.me.today;
       let msg = data.newUser ? `닉네임 '${nick}' 등록 완료! ` : "기록 등록 완료! ";
       if (t) msg += `오늘 ${t.rank}위`;
@@ -913,28 +1254,33 @@ async function submitRank() {
 let state = "idle";
 let g = null;
 let pendingChoices = [];
-let speedMul = 1;              // 1배속 / 2배속
+let speedMul = 2;              // 기본 2배속
+let startPresses = 0;          // 게임 시작 후 메인 시작 버튼을 누른 횟수
+let hiddenSpeed = false;       // 메인 시작 버튼 5회 입력 시 기본의 2배인 4배속
 function newGameData() {
   const data = {
     hp: 500, maxHp: 500,
     xp: 0, needXp: 3, level: 1, pendingLevels: 0,
     kills: 0, time: 0, wave: 1,
     spawnTimer: 1.2, shake: 0, roar: 0, flash: 0, flashColor: "#fff",
-    rerolls: 2, pity: 0, bossReward: false,
+    rerolls: 2, rerollsUsed: 0, pity: 0, bossReward: false,
     rush: null, rushDoneWave: 0, combo: 0, comboTimer: 0, comboBest: 0,
     dmgBy: {},
+    cardRolls: 0, cardOffers: {}, bossSpawns: [], bossKills: [],
     banner: null,
+    discoveredThisRun: new Set(),
     enemies: [], shots: [], pools: [], effects: [], blasts: [],
     units: {},
-    perks: { repair: 0, fort: 0, regen: 0, crit: 0, study: 0 }
+    perks: { expansion: 0, fort: 0, thorns: 0, emergency: 0, crit: 0, study: 0 }
   };
   for (const key of Object.keys(TYPES)) {
     data.units[key] = {
       count: key === "archer" ? 1 : 0,     // 처음에는 궁수 1명만
       dmgLv: 0, spdLv: 0,
-      traits: new Set(), evo: null, awaken: null,
+      traits: new Set(), evo: null, awaken: null, awakenWave: null,
       timers: key === "archer" ? [0.3] : [],
-      shotN: 0, zeroT: 9,
+      shotN: 0, zeroT: 9, guardianT: 6,
+      echoes: [], counterStacks: 0,
       m: null
     };
   }
@@ -956,7 +1302,9 @@ function baseMods(key) {
     line: t.mode === "line", lineW: 8, pierce: t.pierce || 0,
     falloff: t.falloff || 0, boltW: 8, boltSpeed: t.speed, mark: 0, boltBlast: 0,
     incend: false, incendMul: 1, split: 0, knock: 0, meteor: false,
-    lightning: 0, shadow: false
+    lightning: 0, shadow: false, bossFocus: false,
+    doubleSlash: 0, armorBreak: 0, lifeSteal: 0, counter: false, counterMul: 0.35, iai: false,
+    swordWave: 0, swordSaint: false, waveRange: 0, waveMul: 0, guardian: false
   };
 }
 const dmgCap   = u => BASE_DMG_CAP + (u.awaken ? 3 : 0);
@@ -978,7 +1326,12 @@ const getInterval = key => TYPES[key].interval / g.units[key].m.spd;
 const getBurnDps  = () => TYPES.fire.burn * g.units.fire.m.dmg * g.units.fire.m.burnMul;
 const basicCount  = u => u.dmgLv + u.spdLv + Math.max(0, u.count - 1);
 const traitsOpen  = u => u.count > 0 && basicCount(u) >= 2;
-const awakenOpen  = u => u.evo && !u.awaken && u.traits.size >= 4 && u.dmgLv >= 5;
+const awakenOpen = (key, awakenId) => {
+  const u = g.units[key];
+  if (!u.evo || u.awaken || u.traits.size < TRAIT_CAP) return false;
+  if (key === "sword" && awakenId === "guardian") return u.dmgLv >= 2 && u.spdLv >= 3;
+  return u.dmgLv >= 5;
+};
 const awakenOf    = key => { const u = g.units[key]; return u.awaken ? AWAKENS[key].find(a => a.id === u.awaken) : null; };
 // 랭킹·결과에 쓰는 빌드 이름 (각성 > 진화)
 function buildName(key) {
@@ -994,7 +1347,11 @@ function setState(next) {
   $("stateBadge").textContent = labels[next];
   $("stateBadge").dataset.state = next;
   $("battlefield").dataset.state = next;
-  $("startBtn").disabled = next !== "idle";
+  const startBtn = $("startBtn");
+  const fauxDisabled = next !== "idle";
+  startBtn.disabled = false;
+  startBtn.classList.toggle("pseudo-disabled", fauxDisabled);
+  startBtn.setAttribute("aria-disabled", String(fauxDisabled));
   $("pauseBtn").disabled = !(next === "playing" || next === "paused");
   $("pauseBtn").textContent = next === "paused" ? "▶ 계속하기" : "⏸ 일시정지";
   $("restartBtn").disabled = next === "idle";
@@ -1003,16 +1360,14 @@ function say(text) { $("message").textContent = text; }
 function banner(text, color, time = 2.2) {
   g.banner = { text, color, time, max: time };
 }
-function toggleSpeed() {
-  speedMul = speedMul === 1 ? 2 : 1;
-  $("speedBtn").textContent = speedMul === 2 ? "⏩ 2배속" : "⏩ 1배속";
-  $("speedBtn").classList.toggle("fast", speedMul === 2);
-}
 /* =========================================================
    4. 게임 시작 / 일시정지 / 패배
    ========================================================= */
 function startGame() {
   Sound.unlock();
+  speedMul = 2;
+  startPresses = 0;
+  hiddenSpeed = false;
   g = newGameData();
   for (const key of Object.keys(TYPES)) recompute(key);
   hideModal();
@@ -1020,6 +1375,16 @@ function startGame() {
   say("⚔️ 적이 몰려옵니다! 궁수가 자동으로 공격합니다.");
   renderRoster();
   updateHUD();
+}
+function handleStartButton() {
+  Sound.unlock();
+  if (state === "idle" || state === "over") { startGame(); return; }
+  if (hiddenSpeed || !["playing", "paused", "levelup"].includes(state)) return;
+  startPresses += 1;
+  if (startPresses === 5) {
+    hiddenSpeed = true;
+    speedMul = 4;
+  }
 }
 function togglePause() {
   if (state === "playing") { setState("paused"); say("⏸ 일시정지 중입니다."); }
@@ -1086,7 +1451,8 @@ function makeEnemy(kind, x, y) {
     attackTimer: 0.4,
     slowTimer: 0, slowAmount: 0, brittle: 0, freezeTimer: 0, frenzy: 0,
     markTimer: 0, markAmt: 0, poisonTime: 0, poisonDps: 0, poisonSpread: false,
-    knockCd: 0, burning: false, burnVuln: 0, burnSlow: 0, burnExplode: false,
+    knockCd: 0, armorShred: 0, armorShredT: 0,
+    burning: false, burnVuln: 0, burnSlow: 0, burnExplode: false, burnStacks: 0, burnStackT: 0,
     boss: null, dead: false
   };
 }
@@ -1122,6 +1488,13 @@ function spawnBoss() {
       channel: 0, interrupts: 0, need: 4 + cycle, tp: [0.66, 0.33],   // 역병 주술사
       landCd: 10, landed: 0, breathCd: 2      // 화룡
     }
+  });
+  e.boss.telemetryIndex = g.bossSpawns.length;
+  g.bossSpawns.push({
+    id: def.id, name: def.name, wave: g.wave,
+    spawnTime: Math.round(g.time * 10) / 10,
+    castleHp: Math.round(g.hp * 10) / 10, castleMaxHp: g.maxHp,
+    castleHpPct: Math.round(Math.max(0, g.hp) / g.maxHp * 1000) / 10
   });
   g.enemies.push(e);
   banner(`${def.icon} 보스 등장: ${def.name}`, "#f87171", 3);
@@ -1160,6 +1533,7 @@ function shamanHeal(b) {
 function dragonBreath(b) {
   const dmg = 20 * dmgScale() * (1 + b.boss.cycle * 0.3) * (1 - g.perks.fort * 0.1);
   g.hp -= dmg;
+  chargeSwordCounter();
   g.shake = 0.3;
   g.effects.push({ type: "breath", x: b.x, y: b.y, life: 0.6, max: 0.6 });
   addText(CASTLE_X - 10, b.y - 30, `-${Math.round(dmg)}`, "#fb7185", true);
@@ -1234,23 +1608,75 @@ function spawnRushBatch(r) {
    ========================================================= */
 // 대포·화염병은 날고 있는 화룡에게 닿지 않습니다. (박쥐는 맞음)
 const canHit = (key, e) => !(e.boss && e.flying && (key === "fire" || key === "cannon"));
+
+function chargeSwordCounter() {
+  const u=g.units.sword;
+  if (u && u.count && u.m && u.m.counter) u.counterStacks=Math.min(3,u.counterStacks+1);
+}
+function guardianPush() {
+  const line=CASTLE_X+130;
+  let pushed=0;
+  for (const e of g.enemies) {
+    if (e.dead || e.boss || e.x-e.r>line) continue;
+    if (e.kind === "golem") e.x=Math.min(W+20,e.x+20);
+    else e.x=Math.max(e.x,line+e.r);
+    e.knockCd=1; pushed++;
+  }
+  if (pushed) { g.effects.push({type:"guard",x:line,y:GROUND_Y,life:.45,max:.45,color:"#60a5fa"}); Sound.play("shieldBreak"); }
+}
+function isInSwordSlashRange(e, m) {
+  const slashX = CASTLE_X + 10;
+  const slashY = (FIELD_TOP + FIELD_BOTTOM) / 2;
+  const dx = e.x - slashX;
+  const dy = e.y - slashY;
+  return dx >= -e.r && Math.hypot(dx, dy) - e.r <= m.range;
+}
+function swordSlash(mult=1, echo=false) {
+  const u=g.units.sword,m=u.m;
+  const stacks=echo?0:u.counterStacks;
+  const charged=stacks>0;
+  const bonus=1+stacks*(m.counterMul||.35);
+  if (!echo) u.counterStacks=0;
+  const dmg=getDamage("sword")*mult*bonus;
+  const hits=g.enemies.filter(e=>!e.dead&&isInSwordSlashRange(e,m));
+  for (const e of hits) {
+    damageEnemy(e,dmg,{key:"sword",direct:true,forceCrit:m.iai&&charged});
+    if (!e.dead && m.armorBreak) { e.armorShred=Math.max(e.armorShred,m.armorBreak); e.armorShredT=5; }
+  }
+  const waveCount=m.swordSaint?3:m.swordWave?1:0;
+  if (waveCount) {
+    const far=g.enemies.filter(e=>!e.dead&&e.x-e.r>CASTLE_X+m.range&&e.x-e.r<=CASTLE_X+m.waveRange).sort((a,b)=>a.x-b.x);
+    for (let i=0;i<Math.min(waveCount,far.length);i++) damageEnemy(far[i],dmg*m.waveMul,{key:"sword",direct:true});
+  }
+  g.effects.push({type:"slash",x:CASTLE_X+10,y:(FIELD_TOP+FIELD_BOTTOM)/2,r:m.range,life:.22,max:.22,color:charged?"#fbbf24":"#f8fafc"});
+  if (!echo && m.doubleSlash) u.echoes.push({time:.2,mul:m.doubleSlash});
+}
 function updateUnits(dt, targets) {
   const tick = g.roar > 0 ? dt * 0.65 : dt;   // 화룡 포효 중에는 공격이 느려짐
   for (const key of Object.keys(TYPES)) {
     const u = g.units[key];
     if (u.count === 0) continue;
     const m = u.m;
+    if (key === "sword") {
+      for (const e of u.echoes) e.time -= tick;
+      const ready=u.echoes.filter(e=>e.time<=0); u.echoes=u.echoes.filter(e=>e.time>0);
+      ready.forEach(e=>swordSlash(e.mul,true));
+      if (m.guardian) { u.guardianT-=tick; if (u.guardianT<=0) { guardianPush(); u.guardianT+=6; } }
+    }
     const reach = CASTLE_X + m.range;
-    let inRange = targets.filter(e => e.x - e.r <= reach && canHit(key, e));
+    let inRange = key === "sword"
+      ? targets.filter(e => isInSwordSlashRange(e, m))
+      : targets.filter(e => e.x - e.r <= reach && canHit(key, e));
     // 절대영도 (얼음 각성): 일정 시간마다 전장 전체를 얼림
     if (m.zero) {
       u.zeroT -= tick;
       if (u.zeroT <= 0) { absoluteZero(); u.zeroT = 9; }
     }
     if (key === "spear" && inRange.length) {
-      // 창투척병: 성 앞이 위험하지 않으면 보스 → 정예 순으로 우선 공격
+      // 용기병은 전원이 보스를 최우선 공격. 그 외에는 성 앞이 위험하지 않을 때 정예 우선.
       const nearCastle = inRange.filter(e => e.x - e.r < CASTLE_X + 120).length;
-      if (nearCastle < 5) inRange = [...inRange].sort((a, b) => spearPriority(b) - spearPriority(a) || a.x - b.x);
+      if (m.bossFocus) inRange=[...inRange].sort((a,b)=>(b.boss?1:0)-(a.boss?1:0)||spearPriority(b)-spearPriority(a)||a.x-b.x);
+      else if (nearCastle < 5) inRange = [...inRange].sort((a, b) => spearPriority(b) - spearPriority(a) || a.x - b.x);
     }
     const interval = getInterval(key);
     for (let i = 0; i < u.count; i++) {
@@ -1259,7 +1685,8 @@ function updateUnits(dt, targets) {
       if (inRange.length === 0) { u.timers[i] = 0; continue; }
       u.shotN += 1;
       const spread = Math.min(inRange.length, key === "spear" ? 1 + m.multi : 2 + m.multi);
-      for (let j = 0; j < m.multi; j++) {
+      if (key === "sword") swordSlash();
+      else for (let j = 0; j < m.multi; j++) {
         launch(key, inRange[(i * m.multi + j) % spread], j, j === 0 ? u.shotN : 0);
       }
       Sound.play(key);
@@ -1281,7 +1708,7 @@ function launch(key, target, j, shotN) {
   if (key === "archer" && m.shadow && shotN && shotN % 6 === 0) {
     const dx = target.x - ox, dy = target.y - oy, len = Math.hypot(dx, dy) || 1;
     g.shots.push({ mode: "line", key, x: ox, y: oy, vx: dx / len, vy: dy / len, speed: 900, travelled: 0,
-                   maxDist: 1100, hit: new Set(), hits: 0, pierce: 999, dmg: dmg * 4, w: 14, hpPct: 0.02, shadow: true });
+                   maxDist: 1100, hit: new Set(), hits: 0, pierce: 999, dmg: dmg * 2.8, w: 14, hpPct: 0.01, shadow: true });
     return;
   }
   if (key === "ballista") {
@@ -1337,11 +1764,11 @@ function damageEnemy(e, amount, o = {}) {
   let crit = false;
   if (!o.dot) {
     const cc = g.perks.crit * 0.05 + (m ? m.crit : 0);
-    if (Math.random() < cc) { d *= m ? m.critMul : 2; crit = true; }
+    if (o.forceCrit || Math.random() < cc) { d *= m ? m.critMul : 2; crit = true; }
     if (m && (e.elite || b)) d *= m.eliteMul;
     if (m && b) d *= m.bossMul;
     if (o.key === "archer" && e.flying) d *= 1 + FLY_BONUS;   // 궁수: 나는 적에게 강함
-    const armor = Math.max(0, e.armor + e.armorBuff - (m ? m.armorPen : 0));
+    const armor = Math.max(0, e.armor + e.armorBuff - e.armorShred - (m ? m.armorPen : 0));
     d = Math.max(d * 0.2, d - armor);
   }
   // 범위 공격 저항: 정예·방패병·보스는 범위 피해를 덜 받음
@@ -1393,7 +1820,7 @@ function damageEnemy(e, amount, o = {}) {
   }
   if (e.hp <= 0) {
     const over = -e.hp;
-    kill(e);
+    kill(e, src);
     return { crit, killed: true, over };
   }
   return { crit, killed: false, over: 0 };
@@ -1408,7 +1835,7 @@ function breakWall(e) {
   g.effects.push({ type: "ring", x: e.x, y: e.y, r: 90, life: 0.5, max: 0.5, color: "#93c5fd" });
   Sound.play("shieldBreak");
 }
-function kill(e) {
+function kill(e, src) {
   e.dead = true;
   g.kills += 1;
   g.xp += e.xp * (1 + g.perks.study * 0.15);
@@ -1416,6 +1843,7 @@ function kill(e) {
   g.combo += 1;
   g.comboTimer = 0.7;
   g.comboBest = Math.max(g.comboBest, g.combo);
+  if (src === "sword" && g.units.sword.m.lifeSteal) g.hp = Math.min(g.maxHp, g.hp + g.maxHp * g.units.sword.m.lifeSteal);
   if (g.combo % 25 === 0) Sound.play("combo");
   if (e.poisonTime > 0 && e.poisonSpread) {
     for (const o of g.enemies) {
@@ -1424,6 +1852,13 @@ function kill(e) {
   }
   if (e.burning && e.burnExplode) g.blasts.push({ x: e.x, y: e.y });
   if (e.boss) {
+    const spawn = g.bossSpawns[e.boss.telemetryIndex];
+    g.bossKills.push({
+      id: e.boss.def.id, name: e.boss.def.name, wave: g.wave,
+      spawnTime: spawn ? spawn.spawnTime : null,
+      killTime: Math.round(g.time * 10) / 10,
+      elapsed: spawn ? Math.round((g.time - spawn.spawnTime) * 10) / 10 : null
+    });
     g.bossReward = true;
     g.hp = Math.min(g.maxHp, g.hp + g.maxHp * 0.1);
     g.xp += 5;
@@ -1436,6 +1871,10 @@ function applyPoison(e, dps, spread) {
   e.poisonDps = Math.max(e.poisonTime > 0 ? e.poisonDps : 0, dps);
   e.poisonTime = 3;
   e.poisonSpread = e.poisonSpread || spread;
+}
+function applyBurnStack(e) {
+  e.burnStacks=Math.min(5,e.burnStacks+1);
+  e.burnStackT=3;
 }
 function applySlow(e, amount, time, brittle) {
   const a = e.boss ? amount / 2 : amount;   // 보스는 둔화 절반
@@ -1460,6 +1899,7 @@ function explode(s) {
   const split = hits.length > AOE_SPLIT ? Math.sqrt(AOE_SPLIT / hits.length) : 1;
   for (const e of hits) {
     damageEnemy(e, s.dmg * split, { key: s.key, aoe: true });
+    if (s.key === "fire") applyBurnStack(e);
     if (s.key === "ice") {
       applySlow(e, m.slow, m.slowTime, m.brittle);
       if (m.freeze && !e.boss && Math.random() < m.freeze) e.freezeTimer = 1;
@@ -1631,9 +2071,15 @@ function updatePools(dt) {
       // 화염병 불길은 정예의 범위 저항을 무시 (보스는 예외), 대포 소이탄은 범위 저항 적용
       for (const e of inside) {
         const aoe = p.src === "fire" ? !!e.boss : true;
-        damageEnemy(e, p.dps * dt * e.burnRes, { dot: true, aoe, src: p.src });
+        const stackMul=p.src === "fire" ? 1+e.burnStacks*.1 : 1;
+        damageEnemy(e, p.dps * stackMul * dt * e.burnRes, { dot: true, aoe, src: p.src });
       }
     }
+  }
+  // 5중첩 조건부 체력 비례 화상: 초당 0.3%, 정예 절반, 보스 25%, 냉기·치명타 미적용
+  for (const e of g.enemies) if (!e.dead && e.burning && e.burnStacks >= 5) {
+    const scale=e.boss ? 0.25 : e.elite ? 0.5 : 1;
+    damageEnemy(e,e.maxHp*.003*scale*dt,{dot:true,src:"fire"});
   }
   g.pools = g.pools.filter(p => p.time > 0);
   // 연쇄 폭발 처리
@@ -1783,6 +2229,8 @@ function updateEnemies(dt) {
     if (e.slowTimer === 0) e.brittle = 0;
     e.freezeTimer = Math.max(0, e.freezeTimer - dt);
     e.markTimer = Math.max(0, e.markTimer - dt);
+    e.armorShredT=Math.max(0,e.armorShredT-dt); if (!e.armorShredT) e.armorShred=0;
+    e.burnStackT=Math.max(0,e.burnStackT-dt); if (!e.burnStackT) e.burnStacks=0;
     e.knockCd = Math.max(0, e.knockCd - dt);
     e.frenzy = Math.max(0, e.frenzy - dt);
     if (e.poisonTime > 0) {
@@ -1800,6 +2248,7 @@ function updateEnemies(dt) {
       // 늑대왕 돌진 명중: 큰 피해 후 튕겨 나감
       const dmg = e.dmg * 3 * reduce;
       g.hp -= dmg;
+      chargeSwordCounter();
       g.shake = 0.4;
       addText(CASTLE_X - 10, e.y - 30, `-${Math.round(dmg)}`, "#fb7185", true);
       b.dash = 0;
@@ -1812,6 +2261,8 @@ function updateEnemies(dt) {
       if (e.attackTimer <= 0 && e.freezeTimer <= 0 && !(b && b.stun > 0)) {
         const dmg = e.dmg * reduce * (e.frenzy > 0 ? 1.5 : 1);
         g.hp -= dmg;
+        chargeSwordCounter();
+        if (g.perks.thorns) damageEnemy(e,(12+g.wave*2)*g.perks.thorns,{dot:true,src:"thorns"});
         Sound.play("hit");
         e.attackTimer = 1;
         g.shake = 0.15;
@@ -1887,7 +2338,6 @@ function update(dt) {
     g.spawnTimer = spawnInterval();
   }
   updateRush(dt);
-  g.hp = Math.min(g.maxHp, g.hp + g.perks.regen * 1.5 * dt);
   const targets = g.enemies.filter(e => !e.dead).sort((a, b) => a.x - b.x);
   updateUnits(dt, targets);
   updateShots(dt);
@@ -1925,7 +2375,7 @@ function buildPool() {
     if (u.count < countCap(key, u)) pool.push({ kind: "count", key, weight: key === "archer" ? 0.45 : 0.6 });
     if (u.dmgLv < dmgCap(u)) pool.push({ kind: "damage", key, weight: 1 });
     if (u.spdLv < spdCap(key, u)) pool.push({ kind: "speed", key, weight: 0.9 });
-    if (traitsOpen(u)) {
+    if (traitsOpen(u) && u.traits.size < TRAIT_CAP) {
       for (const tr of TRAITS[key]) if (!u.traits.has(tr.id)) pool.push({ kind: "trait", key, id: tr.id, weight: 1 });
     }
     if (!u.evo) {
@@ -1934,16 +2384,19 @@ function buildPool() {
       }
     }
     // 각성: 조건을 채워도 낮은 확률로만 등장
-    if (awakenOpen(u)) {
-      for (const aw of AWAKENS[key]) pool.push({ kind: "awaken", key, id: aw.id, weight: 0.35 });
+    for (const aw of AWAKENS[key]) {
+      if (awakenOpen(key, aw.id)) pool.push({ kind: "awaken", key, id: aw.id, weight: 0.35 });
     }
   }
   for (const [key, p] of Object.entries(PERKS)) {
     const lv = g.perks[key];
     if (lv >= p.max) continue;
     const danger = g.hp / g.maxHp < 0.5;
-    if (g.level < 5 && !(key === "repair" && danger)) continue;   // 초반엔 병력 위주
-    pool.push({ kind: "perk", key, weight: key === "repair" ? (danger ? 2.2 : 0.5) : 0.6 });
+    if (key === "fort" && g.perks.expansion < 1) continue;
+    if (key === "thorns" && g.perks.expansion < 1) continue;
+    if (key === "emergency" && !danger) continue;
+    if (g.level < 5 && key !== "emergency") continue;   // 초반엔 병력 위주
+    pool.push({ kind: "perk", key, weight: key === "emergency" ? 2.2 : 0.6 });
   }
   return pool;
 }
@@ -2040,6 +2493,7 @@ function tagClass(c) {
 function openLevelUp() {
   setState("levelup");
   pendingChoices = makeChoices();
+  recordCardOffers(pendingChoices);
   renderChoices();
   const lv = g.level - g.pendingLevels + 1;
   const more = g.pendingLevels > 1 ? `\n(이어서 ${g.pendingLevels - 1}번 더 선택)` : "";
@@ -2047,6 +2501,7 @@ function openLevelUp() {
   playCardSound();
 }
 function renderChoices() {
+  discoverVisibleCards(pendingChoices);
   const box = $("choices");
   box.replaceChildren();
   pendingChoices.forEach((c, index) => {
@@ -2080,7 +2535,9 @@ function renderChoices() {
 function reroll() {
   if (state !== "levelup" || g.rerolls <= 0) return;
   g.rerolls -= 1;
+  g.rerollsUsed += 1;
   pendingChoices = makeChoices();
+  recordCardOffers(pendingChoices);
   renderChoices();
   playCardSound();
 }
@@ -2094,7 +2551,7 @@ function playCardSound() {
 // 보유하지 않은 특성 1개 획득 (진화 짝이 되는 것을 우선)
 function giveTrait(key) {
   const u = g.units[key];
-  const missing = TRAITS[key].filter(t => !u.traits.has(t.id)).map(t => t.id);
+  const missing = u.traits.size >= TRAIT_CAP ? [] : TRAITS[key].filter(t => !u.traits.has(t.id)).map(t => t.id);
   if (!missing.length) { u.dmgLv = Math.min(dmgCap(u), u.dmgLv + 1); return; }
   const pairing = u.evo ? [] : missing.filter(id =>
     EVOS[key].some(e => e.need.includes(id) && e.need.some(n => n !== id && u.traits.has(n))));
@@ -2111,13 +2568,15 @@ function applyChoice(index) {
   if (state !== "levelup") return;
   const c = pendingChoices[index];
   if (!c) return;
+  recordCardPick(c);
   const info = describe(c);
   if (c.kind === "perk") {
     const times = c.rarity === "common" ? 1 : 2;
     for (let i = 0; i < times; i++) {
       if (g.perks[c.key] >= PERKS[c.key].max) break;
       g.perks[c.key] += 1;
-      if (c.key === "repair") { g.maxHp += 60; g.hp = Math.min(g.maxHp, g.hp + g.maxHp * 0.4); }
+      if (c.key === "expansion") { g.maxHp += 100; g.hp = Math.min(g.maxHp, g.hp + 100); }
+      if (c.key === "emergency") g.hp = Math.min(g.maxHp, g.hp + g.maxHp * 0.4);
     }
     if (c.rarity === "legend") g.hp = g.maxHp;
   } else {
@@ -2127,6 +2586,7 @@ function applyChoice(index) {
     const addSpd = n => { u.spdLv = Math.min(spdCap(c.key, u), u.spdLv + n); };
     if (c.kind === "awaken") {
       u.awaken = c.id;
+      u.awakenWave = g.wave;
       const aw = AWAKENS[c.key].find(a => a.id === c.id);
       banner(`⚡ 각성! ${t.icon} ${aw.name}`, aw.aura, 3);
       g.flash = 0.6; g.flashColor = aw.aura;
@@ -2190,7 +2650,7 @@ function renderRoster() {
                  `대략 DPS ${Math.round(dps)} · 공격력 Lv${u.dmgLv}/${dmgCap(u)} · 속도 Lv${u.spdLv}/${spdCap(key, u)}\n`;
       if (traitsOpen(u)) {
         const names = TRAITS[key].filter(x => u.traits.has(x.id)).map(x => x.name);
-        text += `특성(${names.length}/5): ${names.length ? names.join(", ") : "없음"}`;
+        text += `특성(${names.length}/${TRAIT_CAP}): ${names.length ? names.join(", ") : "없음"}`;
       } else {
         text += `특성 해금까지 기본 강화 ${basicCount(u)}/2`;
       }
@@ -2224,7 +2684,7 @@ function renderRoster() {
   ct.textContent = "🏰 성 강화";
   const ci = document.createElement("div");
   const p = g.perks;
-  ci.textContent = `피해 감소 ${p.fort * 10}% · 회복 ${p.regen * 1.5}/초\n치명타 +${p.crit * 5}% · 경험치 +${p.study * 15}%`;
+  ci.textContent = `증축 Lv${p.expansion} · 피해 감소 ${p.fort * 10}% · 가시 Lv${p.thorns}\n치명타 +${p.crit * 5}% · 경험치 +${p.study * 15}%`;
   castle.append(ct, ci);
   box.appendChild(castle);
 }
@@ -2565,6 +3025,12 @@ function draw() {
     if (fx.type === "boom" || fx.type === "ring") {
       ctx.strokeStyle = fx.color; ctx.lineWidth = 4;
       ctx.beginPath(); ctx.arc(fx.x, fx.y, Math.max(1, fx.r * (1.1 - a * 0.6)), 0, Math.PI * 2); ctx.stroke();
+    } else if (fx.type === "slash") {
+      ctx.strokeStyle=fx.color; ctx.lineWidth=8;
+      ctx.beginPath(); ctx.arc(fx.x,fx.y,fx.r*(1.15-a*.25),-1.15,1.15); ctx.stroke();
+    } else if (fx.type === "guard") {
+      ctx.strokeStyle=fx.color; ctx.lineWidth=7;
+      ctx.beginPath(); ctx.moveTo(fx.x,GROUND_Y); ctx.lineTo(fx.x,H); ctx.stroke();
     } else if (fx.type === "breath") {
       ctx.strokeStyle = "#f97316"; ctx.lineWidth = 18;
       ctx.beginPath(); ctx.moveTo(fx.x - 30, fx.y - 26); ctx.lineTo(CASTLE_X, fx.y); ctx.stroke();
@@ -2589,7 +3055,7 @@ function draw() {
   const nextWave = WAVE_TIME - (g.time % WAVE_TIME);
   const bossIn = 5 - (g.wave % 5);
   const nextBoss = BOSSES[Math.floor(g.wave / 5) % BOSSES.length];
-  ctx.fillText(`🌊 웨이브 ${g.wave} · 다음 ${Math.ceil(nextWave)}초 · ${nextBoss.icon} 보스까지 ${bossIn}웨이브${speedMul > 1 ? " · ⏩×2" : ""}`, W - 14, 18);
+  ctx.fillText(`🌊 웨이브 ${g.wave} · 다음 ${Math.ceil(nextWave)}초 · ${nextBoss.icon} 보스까지 ${bossIn}웨이브`, W - 14, 18);
   if (g.roar > 0) {
     ctx.fillStyle = "#fda4af";
     ctx.fillText("🐉 포효: 아군 공격속도 -35%", W - 14, 76);
@@ -2659,19 +3125,29 @@ function loop(now) {
 /* =========================================================
    15. 이벤트 연결 및 초기화
    ========================================================= */
-$("startBtn").addEventListener("click", startGame);
+$("startBtn").addEventListener("click", handleStartButton);
 $("restartBtn").addEventListener("click", startGame);
 $("modalBtn").addEventListener("click", startGame);
 $("pauseBtn").addEventListener("click", togglePause);
-$("speedBtn").addEventListener("click", toggleSpeed);
 $("soundBtn").addEventListener("click", toggleSound);
+$("codexBtn").addEventListener("click", openCodex);
+$("codexClose").addEventListener("click", closeCodex);
+$("codexModal").addEventListener("click", e => { if (e.target === $("codexModal")) closeCodex(); });
+document.querySelectorAll("[data-codex]").forEach(btn=>btn.addEventListener("click",()=>{codexFilter=btn.dataset.codex;renderCodex();}));
 document.addEventListener("pointerdown", () => Sound.unlock(), { once: true });
 document.addEventListener("keydown", () => Sound.unlock(), { once: true });
 $("rerollBtn").addEventListener("click", reroll);
 document.querySelectorAll(".rank-tabs .tab[data-tab]").forEach(btn => {
-  btn.addEventListener("click", () => { rankTab = btn.dataset.tab; renderRankBoards(); });
+  btn.addEventListener("click", () => {
+    rankTab = btn.dataset.tab;
+    renderRankBoards();
+    if (rankTab === "hall") loadHall();
+  });
 });
-$("rankRefresh").addEventListener("click", () => { loadRanking(); loadHall(); });
+$("rankRefresh").addEventListener("click", () => {
+  loadRanking();
+  if (rankTab === "hall") loadHall(true);
+});
 $("submitBtn").addEventListener("click", submitRank);
 $("pinInput").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4); });
 for (const id of ["nickInput", "pinInput"]) {
@@ -2686,8 +3162,6 @@ document.addEventListener("keydown", event => {
              (state === "playing" || state === "paused")) {
     event.preventDefault();
     togglePause();
-  } else if (event.key === "f" || event.key === "F") {
-    toggleSpeed();
   }
 });
 document.addEventListener("visibilitychange", () => {
@@ -2695,6 +3169,7 @@ document.addEventListener("visibilitychange", () => {
 });
 loadRecords();
 loadSoundSetting();
+loadCollectionCache();
 g = newGameData();
 for (const key of Object.keys(TYPES)) recompute(key);
 setState("idle");
@@ -2707,8 +3182,7 @@ $("shieldResText").textContent = Math.round((1 - SHIELD_AOE_RES) * 100);
 $("modalRank").hidden = !rankEnabled();
 renderRankBoards();
 loadRanking();
-loadHall();
-const NOTICE_KEY = "castle_notice_v6.1";
+const NOTICE_KEY = "castle_notice_v7";
 if (localStorage.getItem(NOTICE_KEY) !== "1") {
 
   $("modal").hidden = true;
