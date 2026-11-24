@@ -1690,12 +1690,9 @@ function updateUnits(dt, targets) {
     }
     let focusedBoss = null;
     if (key === "spear" && inRange.length) {
-      // 용기병: 사거리 안에 보스가 있으면 모든 창병의 모든 창이 같은 보스를 직접 조준.
-      // 그 외에는 기존 일반 창 우선순위를 그대로 사용.
-      const nearCastle = inRange.filter(e => e.x - e.r < CASTLE_X + 120).length;
-      if (m.bossFocus) focusedBoss = inRange.filter(e => e.boss).sort((a, b) => a.x - b.x)[0] || null;
-      if (focusedBoss) inRange = [focusedBoss];
-      else if (nearCastle < 5) inRange = [...inRange].sort((a, b) => spearPriority(b) - spearPriority(a) || a.x - b.x);
+      // Apply spear priority even when enemies crowd the castle.
+      inRange.sort((a, b) => spearPriority(b) - spearPriority(a) || a.x - b.x);
+      if (m.bossFocus && inRange[0].boss) focusedBoss = inRange[0];
     }
     const interval = getInterval(key);
     for (let i = 0; i < u.count; i++) {
@@ -1710,7 +1707,7 @@ function updateUnits(dt, targets) {
       }
       else for (let j = 0; j < m.multi; j++) {
         const target = focusedBoss || inRange[(i * m.multi + j) % spread];
-        launch(key, target, j, j === 0 ? u.shotN : 0, focusedBoss);
+        launch(key, target, j, j === 0 ? u.shotN : 0);
       }
       Sound.play(key);
       u.timers[i] += interval;
@@ -1722,7 +1719,7 @@ function spearPriority(e) {
   if (e.boss) return 5;
   return { golem: 4, shield: 3, orc: 2, knight: 1 }[e.kind] || 0;
 }
-function launch(key, target, j, shotN, focusedBoss = null) {
+function launch(key, target, j, shotN) {
   const t = TYPES[key];
   const m = g.units[key].m;
   const ox = 128, oy = t.rowY + j * 3;
@@ -1745,7 +1742,8 @@ function launch(key, target, j, shotN, focusedBoss = null) {
     const spd = key === "ice" ? 650 : t.speed;
     g.shots.push({ mode: "line", key, x: ox, y: oy, vx: dx / len, vy: dy / len, speed: spd, travelled: 0,
                    maxDist: m.range + 260, hit: new Set(), hits: 0, pierce: m.pierce, dmg, w: m.lineW,
-                   focusTarget: focusedBoss, focusHit: !focusedBoss });
+                   focusTarget: key === "spear" ? target : null, focusHit: key !== "spear",
+                   impactX: 0, impactY: 0 });
   } else if (t.mode === "single") {
     g.shots.push({ mode: "single", key, x: ox, y: oy, target, tx: target.x, ty: target.y,
                    hit: new Set(), chainLeft: m.chain, carries: 0, dmg, lost: false });
@@ -2046,12 +2044,19 @@ function updateShots(dt) {
         s.x += s.vx * st; s.y += s.vy * st; s.travelled += st;
         for (const e of g.enemies) {
           if (e.dead || s.hit.has(e)) continue;
-          // 용기병 집중 창은 조준한 보스와 충돌하기 전에는 앞의 적을 통과한다.
+          // A spear ignores other enemies until its selected target is hit.
           if (s.focusTarget && !s.focusHit && e !== s.focusTarget) continue;
+          // After impact, only hit enemies behind the target along the flight path.
+          if (s.focusTarget && s.focusHit &&
+              (e.x - s.impactX) * s.vx + (e.y - s.impactY) * s.vy < 0) continue;
           if (Math.hypot(e.x - s.x, e.y - s.y) > e.r + s.w) continue;
           s.hit.add(e);
           lineHit(s, e);
-          if (e === s.focusTarget) s.focusHit = true;
+          if (e === s.focusTarget) {
+            s.focusHit = true;
+            s.impactX = e.x;
+            s.impactY = e.y;
+          }
           s.hits += 1;
           if (s.hits >= s.pierce) { s.done = true; break; }
           if (state !== "playing") break;
