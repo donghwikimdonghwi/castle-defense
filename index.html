@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>작은 성 지키기 v7 - 도감과 검사</title>
+<title>작은 성 지키기 v7.1 - 도감과 검사</title>
 <style>
   * { box-sizing: border-box; }
   :root {
@@ -321,11 +321,17 @@
     <h2>📢 공지사항</h2>
 
     <p>
-# 🏰 작은 성 지키기 v7 패치노트
+# 🏰 작은 성 지키기 v7.1 패치노트
 
 !!중요!! 닉네임/데이터 관리를 위해 1인 1계정으로 운영하려합니다. 
 @@@ v7부터는 실명 닉 제외 모두 삭제합니다. @@@
 
+##### 7.1 hotfix  ######
+- 창이 정예/보스 우선타격하지 않던 버그 수정
+- 레벨업 즉시 카드선택이 뜨지 않던 버그 수정
+- 다른 브라우저로 접속 시 도감이 뜨지않던 버그 수정
+- 검사 이펙트 수정 및 상향
+     
 ## 🆕 새로운 요소
 
 ### ⚔️ 신규 병기: 검사
@@ -437,7 +443,7 @@ const ELITE_AOE_RES = 0.65;        // 정예가 받는 범위 피해 배율 (0.6
 const SHIELD_AOE_RES = 0.4;        // 방패병이 받는 범위 피해 배율 (0.4 = 60% 감소)
 const FLY_BONUS = 0.3;             // 궁수가 나는 적에게 주는 추가 피해
 const LATE_WAVE = 17;              // 이 웨이브부터 적 체력이 가파르게 증가
-const LATE_HP_MUL = 1.12;          // 후반 웨이브마다 적 체력 배율
+const LATE_HP_MUL = 1.11;          // 후반 웨이브마다 적 체력 배율
 const STORE_KEY = "tiny-castle-defense-records-v7";
 const SOUND_KEY = "tiny-castle-defense-sound";
 const MAX_ENEMIES = 220;           // 화면 위 적 수 상한 (성능 보호)
@@ -488,7 +494,7 @@ const TYPES = {
 const TRAITS = {
   sword: [
     { id: "longBlade", name: "긴 칼날", desc: "베기 범위 +30%", mod: m => { m.range *= 1.3; } },
-    { id: "dual", name: "쌍검", desc: "0.2초 뒤 공격력 80%로 한 번 더 벰", mod: m => { m.doubleSlash = 1; } },
+    { id: "dual", name: "쌍검", desc: "0.2초 뒤 공격력 100%로 한 번 더 벰", mod: m => { m.doubleSlash = 1; } },
     { id: "armorBreak", name: "갑옷 가르기", desc: "방어력 5 무시, 맞은 적 방어력 5초간 -3", mod: m => { m.armorPen += 5; m.armorBreak = 3; } },
     { id: "lifesteal", name: "흡혈", desc: "검사로 처치 시 성 최대 HP의 0.4% 회복", mod: m => { m.lifeSteal = 0.004; } },
     { id: "counter", name: "반격 자세", desc: "성이 피해를 받으면 분노(최대 3), 다음 베기 피해 증가", mod: m => { m.counter = true; } }
@@ -509,7 +515,7 @@ const TRAITS = {
   ],
   fire: [
     { id: "napalm", name: "네이팜", desc: "불길 지속시간 +2초", mod: m => { m.burnTime += 2; } },
-    { id: "oil",    name: "기름", desc: "불길 피해 ×1.5", mod: m => { m.burnMul *= 1.5; } },
+    { id: "oil",    name: "기름", desc: "불길 피해 ×1.4", mod: m => { m.burnMul *= 1.4; } },
     { id: "wide",   name: "넓은 투척", desc: "범위 ×1.3", mod: m => { m.radius *= 1.3; } },
     { id: "multiF", name: "연속 투척", desc: "한 번에 화염병 +1개", mod: m => { m.multi += 1; } },
     { id: "panic",  name: "공포", desc: "불길 위의 적 이동속도 -30%", mod: m => { m.burnSlow = Math.max(m.burnSlow, 0.3); } }
@@ -517,7 +523,7 @@ const TRAITS = {
   ice: [
     { id: "deep",    name: "혹한", desc: "둔화 40% → 60%", mod: m => { m.slow = Math.max(m.slow, 0.6); } },
     { id: "long",    name: "긴 냉기", desc: "둔화 시간 +1.5초", mod: m => { m.slowTime += 1.5; } },
-    { id: "shard",   name: "얼음 파편", desc: "공격력 ×2.2", mod: m => { m.dmg *= 2.2; } },
+    { id: "shard",   name: "얼음 파편", desc: "공격력 ×2", mod: m => { m.dmg *= 2; } },
     { id: "wideI",   name: "넓은 냉기", desc: "범위 ×1.3", mod: m => { m.radius *= 1.3; } },
     { id: "brittle", name: "취약", desc: "냉기 받는 피해 증가 +20% → +40%", mod: m => { m.brittle += 0.2; } }
   ],
@@ -530,7 +536,7 @@ const TRAITS = {
   ],
   cannon: [
     { id: "caliber",  name: "대구경", desc: "폭발 범위 ×1.35", mod: m => { m.radius *= 1.35; } },
-    { id: "powder",   name: "강화 화약", desc: "공격력 ×1.15", mod: m => { m.dmg *= 1.15; } },
+    { id: "powder",   name: "강화 화약", desc: "공격력 ×1.2", mod: m => { m.dmg *= 1.2; } },
     { id: "shrapnel", name: "파편", desc: "폭발 후 소형 폭탄 3개 분열", mod: m => { m.split = Math.max(m.split, 3); } },
     { id: "reload",   name: "장전 숙련", desc: "공격속도 ×1.3", mod: m => { m.spd *= 1.3; } },
     { id: "shock",    name: "충격파", desc: "폭발 시 적을 25px 밀어냄", mod: m => { m.knock = Math.max(m.knock, 25); } }
@@ -609,7 +615,7 @@ const AWAKENS = {
   ],
   fire: [
     { id: "inferno",     name: "업화", aura: "#ef4444", desc: "불길 피해 ×2, 지속 +3초\n불길 위에서 죽은 적이 폭발", mod: m => { m.burnMul *= 2; m.burnTime += 3; m.burnExplode = true; } },
-    { id: "lava",        name: "용암 분출", aura: "#f97316", desc: "용암 지대: 범위 ×1.35, 불길 피해 ×1.6\n용암 위 적 이동속도 -50%", mod: m => { m.radius *= 1.35; m.burnMul *= 1.6; m.burnSlow = Math.max(m.burnSlow, 0.5); m.lava = true; } }
+    { id: "lava",        name: "용암 분출", aura: "#f97316", desc: "용암 지대: 범위 ×1.3, 불길 피해 ×1.6\n용암 위 적 이동속도 -50%", mod: m => { m.radius *= 1.3; m.burnMul *= 1.6; m.burnSlow = Math.max(m.burnSlow, 0.5); m.lava = true; } }
   ],
   ice: [
     { id: "absZero",     name: "절대영도", aura: "#67e8f9", desc: "9초마다 전장 전체를 얼림\n(보스 외 1.5초 정지 + 공격력 ×5 피해)", mod: m => { m.zero = true; } },
@@ -617,7 +623,7 @@ const AWAKENS = {
   ],
   ballista: [
     { id: "railgun",     name: "레일건", aura: "#e879f9", desc: "순식간에 화면을 꿰뚫는 광선\n공격력 ×1.9, 판정 폭 4배, 관통 감소 6%", mod: m => { m.dmg *= 1.9; m.boltW = 30; m.falloff = Math.min(m.falloff, 0.06); m.boltSpeed = 3200; } },
-    { id: "burstBolt",   name: "폭뢰 쇠뇌", aura: "#fb7185", desc: "볼트가 맞힐 때마다 폭발\n(반경 50, 공격력 37%)", mod: m => { m.boltBlast = 0.37; } }
+    { id: "burstBolt",   name: "폭뢰 쇠뇌", aura: "#fb7185", desc: "볼트가 맞힐 때마다 폭발\n(반경 50, 공격력 35%)", mod: m => { m.boltBlast = 0.35; } }
   ],
   cannon: [
     { id: "meteor",      name: "궤도 포격", aura: "#fde047", desc: "3번째 포격마다 운석 낙하\n(범위 ×2.2, 공격력 ×3.5)", mod: m => { m.meteor = true; } },
