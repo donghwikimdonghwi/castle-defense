@@ -1668,6 +1668,7 @@ function swordSlash(mult=1, echo=false) {
 function updateUnits(dt, targets) {
   const tick = g.roar > 0 ? dt * 0.65 : dt;   // 화룡 포효 중에는 공격이 느려짐
   for (const key of Object.keys(TYPES)) {
+    if (state !== "playing") return;
     const u = g.units[key];
     if (u.count === 0) continue;
     const m = u.m;
@@ -1685,11 +1686,15 @@ function updateUnits(dt, targets) {
     if (m.zero) {
       u.zeroT -= tick;
       if (u.zeroT <= 0) { absoluteZero(); u.zeroT = 9; }
+      if (state !== "playing") return;
     }
+    let focusedBoss = null;
     if (key === "spear" && inRange.length) {
-      // 용기병은 전원이 보스를 최우선 공격. 그 외에는 성 앞이 위험하지 않을 때 정예 우선.
+      // 용기병: 사거리 안에 보스가 있으면 모든 창병의 모든 창이 같은 보스를 직접 조준.
+      // 그 외에는 기존 일반 창 우선순위를 그대로 사용.
       const nearCastle = inRange.filter(e => e.x - e.r < CASTLE_X + 120).length;
-      if (m.bossFocus) inRange=[...inRange].sort((a,b)=>(b.boss?1:0)-(a.boss?1:0)||spearPriority(b)-spearPriority(a)||a.x-b.x);
+      if (m.bossFocus) focusedBoss = inRange.filter(e => e.boss).sort((a, b) => a.x - b.x)[0] || null;
+      if (focusedBoss) inRange = [focusedBoss];
       else if (nearCastle < 5) inRange = [...inRange].sort((a, b) => spearPriority(b) - spearPriority(a) || a.x - b.x);
     }
     const interval = getInterval(key);
@@ -1699,21 +1704,25 @@ function updateUnits(dt, targets) {
       if (inRange.length === 0) { u.timers[i] = 0; continue; }
       u.shotN += 1;
       const spread = Math.min(inRange.length, key === "spear" ? 1 + m.multi : 2 + m.multi);
-      if (key === "sword") swordSlash();
+      if (key === "sword") {
+        swordSlash();
+        if (state !== "playing") return;
+      }
       else for (let j = 0; j < m.multi; j++) {
-        launch(key, inRange[(i * m.multi + j) % spread], j, j === 0 ? u.shotN : 0);
+        const target = focusedBoss || inRange[(i * m.multi + j) % spread];
+        launch(key, target, j, j === 0 ? u.shotN : 0, focusedBoss);
       }
       Sound.play(key);
       u.timers[i] += interval;
     }
   }
 }
-// 창투척병 우선순위: 보스 > 골렘 > 기사 > 방패병 > 오크 > 일반
+// 창투척병 우선순위: 보스 > 골렘 > 방패병 > 오크 > 기사 > 일반
 function spearPriority(e) {
   if (e.boss) return 5;
-  return { golem: 4, knight: 3, shield: 2, orc: 1 }[e.kind] || 0;
+  return { golem: 4, shield: 3, orc: 2, knight: 1 }[e.kind] || 0;
 }
-function launch(key, target, j, shotN) {
+function launch(key, target, j, shotN, focusedBoss = null) {
   const t = TYPES[key];
   const m = g.units[key].m;
   const ox = 128, oy = t.rowY + j * 3;
@@ -1735,7 +1744,8 @@ function launch(key, target, j, shotN) {
     const dx = target.x - ox, dy = target.y - oy, len = Math.hypot(dx, dy) || 1;
     const spd = key === "ice" ? 650 : t.speed;
     g.shots.push({ mode: "line", key, x: ox, y: oy, vx: dx / len, vy: dy / len, speed: spd, travelled: 0,
-                   maxDist: m.range + 260, hit: new Set(), hits: 0, pierce: m.pierce, dmg, w: m.lineW });
+                   maxDist: m.range + 260, hit: new Set(), hits: 0, pierce: m.pierce, dmg, w: m.lineW,
+                   focusTarget: focusedBoss, focusHit: !focusedBoss });
   } else if (t.mode === "single") {
     g.shots.push({ mode: "single", key, x: ox, y: oy, target, tx: target.x, ty: target.y,
                    hit: new Set(), chainLeft: m.chain, carries: 0, dmg, lost: false });
@@ -1880,6 +1890,25 @@ function kill(e, src) {
     banner(`🏆 ${e.boss.def.name} 처치! 다음 레벨업 희귀 이상 보장`, "#fcd34d", 3);
     say(`🏆 ${e.boss.def.name}을(를) 쓰러뜨렸습니다! 성 HP 10% 회복`);
   }
+  // 경험치를 얻은 바로 이 호출 안에서 레벨과 UI를 확정해 남은 전투 처리를 중단한다.
+  processLevelUpsNow();
+}
+function processLevelUpsNow() {
+  let leveled = false;
+  while (g.xp >= g.needXp) {
+    g.xp -= g.needXp;
+    g.level += 1;
+    g.pendingLevels += 1;
+    g.needXp = nextNeedXp(g.level);
+    if (g.level % 10 === 0) g.rerolls += 1;
+    leveled = true;
+  }
+  if (leveled) updateHUD();
+  if (g.pendingLevels > 0 && state === "playing") {
+    openLevelUp();
+    return true;
+  }
+  return state === "levelup";
 }
 function applyPoison(e, dps, spread) {
   e.poisonDps = Math.max(e.poisonTime > 0 ? e.poisonDps : 0, dps);
@@ -1981,6 +2010,7 @@ function lineHit(s, e) {
 }
 function updateShots(dt) {
   for (const s of g.shots) {
+    if (state !== "playing") break;
     if (s.done) continue;
     if (s.mode === "aoe") {
       s.t += dt;
@@ -1993,7 +2023,7 @@ function updateShots(dt) {
       const m = g.units.ballista.m;
       const total = s.speed * dt;
       const steps = Math.max(1, Math.ceil(total / 12));
-      for (let k = 0; k < steps && !s.done; k++) {
+      for (let k = 0; k < steps && !s.done && state === "playing"; k++) {
         s.x += total / steps;
         for (const e of g.enemies) {
           if (e.dead || s.hit.has(e)) continue;
@@ -2004,25 +2034,31 @@ function updateShots(dt) {
           if (m.mark) { e.markTimer = 3; e.markAmt = Math.max(e.markAmt, m.mark); }
           if (m.boltBlast) explode({ key: "ballista", tx: e.x, ty: e.y, dmg: s.dmg * m.boltBlast, blast: true });
           s.hits += 1;
+          if (state !== "playing") break;
         }
         if (s.x > W + 40) s.done = true;
       }
     } else if (s.mode === "line") {
       const total = s.speed * dt;
       const steps = Math.max(1, Math.ceil(total / 12));
-      for (let k = 0; k < steps && !s.done; k++) {
+      for (let k = 0; k < steps && !s.done && state === "playing"; k++) {
         const st = total / steps;
         s.x += s.vx * st; s.y += s.vy * st; s.travelled += st;
         for (const e of g.enemies) {
           if (e.dead || s.hit.has(e)) continue;
+          // 용기병 집중 창은 조준한 보스와 충돌하기 전에는 앞의 적을 통과한다.
+          if (s.focusTarget && !s.focusHit && e !== s.focusTarget) continue;
           if (Math.hypot(e.x - s.x, e.y - s.y) > e.r + s.w) continue;
           s.hit.add(e);
           lineHit(s, e);
+          if (e === s.focusTarget) s.focusHit = true;
           s.hits += 1;
           if (s.hits >= s.pierce) { s.done = true; break; }
+          if (state !== "playing") break;
         }
         if (s.travelled > s.maxDist || s.x > W + 40 || s.y < -40 || s.y > H + 40) s.done = true;
       }
+      if (state !== "playing") break;
     } else {
       // 유도 화살: 목표가 먼저 죽으면 근처 다른 적으로 바꾸고, 없으면 그 자리까지 날아가 사라짐
       if (!s.lost && s.target.dead) {
@@ -2045,6 +2081,7 @@ function updateShots(dt) {
         const res = damageEnemy(e, s.dmg, { key: s.key, direct: true });
         if (m.poison > 0) applyPoison(e, s.dmg * m.poison * (res.crit ? m.poisonCrit : 1), m.spreadPoison);
         s.hit.add(e);
+        if (state !== "playing") { s.done = true; break; }
         let next = null;
         // 궁수 기본 능력: 적을 잡으면 남은 피해로 다음 적을 계속 공격
         if (res.killed && m.carry > 0 && res.over > 1 && s.carries < (m.carry > 0.8 ? 6 : 4)) {
@@ -2087,6 +2124,7 @@ function updatePools(dt) {
         const aoe = p.src === "fire" ? !!e.boss : true;
         const stackMul=p.src === "fire" ? 1+e.burnStacks*.1 : 1;
         damageEnemy(e, p.dps * stackMul * dt * e.burnRes, { dot: true, aoe, src: p.src });
+        if (state !== "playing") return;
       }
     }
   }
@@ -2094,6 +2132,7 @@ function updatePools(dt) {
   for (const e of g.enemies) if (!e.dead && e.burning && e.burnStacks >= 5) {
     const scale=e.boss ? 0.25 : e.elite ? 0.5 : 1;
     damageEnemy(e,e.maxHp*.003*scale*dt,{dot:true,src:"fire"});
+    if (state !== "playing") return;
   }
   g.pools = g.pools.filter(p => p.time > 0);
   // 연쇄 폭발 처리
@@ -2102,7 +2141,10 @@ function updatePools(dt) {
   for (const b of blasts) {
     const dmg = TYPES.fire.damage * g.units.fire.m.dmg * 5;
     for (const e of g.enemies) {
-      if (!e.dead && !e.flying && Math.hypot(e.x - b.x, e.y - b.y) < 60 + e.r) damageEnemy(e, dmg, { dot: true, aoe: true, src: "fire" });
+      if (!e.dead && !e.flying && Math.hypot(e.x - b.x, e.y - b.y) < 60 + e.r) {
+        damageEnemy(e, dmg, { dot: true, aoe: true, src: "fire" });
+        if (state !== "playing") return;
+      }
     }
     g.effects.push({ type: "boom", x: b.x, y: b.y, r: 60, life: 0.3, max: 0.3, color: "#fde047" });
   }
@@ -2238,6 +2280,7 @@ function updateEnemies(dt) {
   const reduce = 1 - g.perks.fort * 0.1;
   for (const e of g.enemies) e.armorBuff = 0;
   for (const e of g.enemies) {
+    if (state !== "playing") break;
     if (e.dead) continue;
     e.slowTimer = Math.max(0, e.slowTimer - dt);
     if (e.slowTimer === 0) e.brittle = 0;
@@ -2250,6 +2293,7 @@ function updateEnemies(dt) {
     if (e.poisonTime > 0) {
       e.poisonTime -= dt;
       damageEnemy(e, e.poisonDps * dt, { dot: true, src: "archer" });
+      if (state !== "playing") break;
       if (e.dead) continue;
     }
     if (e.boss) updateBoss(e, dt);
@@ -2290,6 +2334,10 @@ function updateEnemies(dt) {
       e.y += Math.sin(g.time * 1.7 + e.phase) * 10 * dt;
     }
     e.y = Math.min(FIELD_BOTTOM, Math.max(FIELD_TOP, e.y));
+  }
+  if (state !== "playing") {
+    g.enemies = g.enemies.filter(e => !e.dead);
+    return;
   }
   separate();
   g.enemies = g.enemies.filter(e => !e.dead);
@@ -2338,6 +2386,7 @@ function updateEffects(dt) {
    10. 한 프레임 진행
    ========================================================= */
 function update(dt) {
+  if (processLevelUpsNow()) return;
   g.time += dt;
   const wave = 1 + Math.floor(g.time / WAVE_TIME);
   if (wave > g.wave) {
@@ -2352,11 +2401,16 @@ function update(dt) {
     g.spawnTimer = spawnInterval();
   }
   updateRush(dt);
+  if (state !== "playing") return;
   const targets = g.enemies.filter(e => !e.dead).sort((a, b) => a.x - b.x);
   updateUnits(dt, targets);
+  if (state !== "playing") return;
   updateShots(dt);
+  if (state !== "playing") return;
   updatePools(dt);
+  if (state !== "playing") return;
   updateEnemies(dt);
+  if (state !== "playing") return;
   updateEffects(dt);
   if (g.hp <= 0) {
     g.hp = 0;
@@ -2364,15 +2418,8 @@ function update(dt) {
     gameOver();
     return;
   }
-  while (g.xp >= g.needXp) {
-    g.xp -= g.needXp;
-    g.level += 1;
-    g.pendingLevels += 1;
-    g.needXp = nextNeedXp(g.level);
-    if (g.level % 10 === 0) g.rerolls += 1;
-  }
-  // 러시 중에는 레벨업을 미뤘다가, 끝난 뒤 한꺼번에 선택
-  if (g.pendingLevels > 0 && !g.rush) openLevelUp();
+  // kill()에서 즉시 처리하지만, 외부에서 경험치가 바뀌는 경우를 위한 방어적 확인.
+  processLevelUpsNow();
 }
 // 다음 레벨까지 필요한 경험치
 function nextNeedXp(level) {
