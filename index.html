@@ -267,7 +267,7 @@
   </section>
   <p class="help">
     <b>성장</b> · 기본 강화 2번 → <b>특성</b> 해금 · 특성 2개 짝 → <b>🧬 진화</b> ·
-    진화 + 특성 4개 + 공격력 Lv5 → 낮은 확률로 <b>⚡ 각성</b>(병기당 1개, 강화 한계 상승 + 특별 공격)<br>
+    진화 1개 + 특성 4개 + 각성별 공격력·공격속도 조건 → 낮은 확률로 <b>⚡ 각성</b>(병기당 1개, 강화 한계 상승 + 특별 공격)<br>
     <b>병기 특징</b> · 🏹 궁수: 잡몹에 강함(적을 잡으면 남은 피해로 다음 적 공격), 나는 적에게 피해 +30% ·
     ⚔️ 검사: 성 앞 초근접 반달 베기(범위 분산·정예 저항 제외) · 🔱 창: 정예·보스에 강함(3관통, 정예·보스 +40%) · 🎯 발리스타: 무제한 관통 ·
     💣 대포: 강한 범위 폭발 · 🔥 화염병: 불길은 방어력과 정예의 범위 저항을 무시 · ❄️ 얼음: 범위 둔화 + 받는 피해 증가<br>
@@ -323,10 +323,28 @@
     <p>
 # 🏰 작은 성 지키기 v7.1 패치노트
 
-!!중요!! 닉네임/데이터 관리를 위해 1인 1계정으로 운영하려합니다. 
+!!중요!! 닉네임/데이터 관리를 위해 1인 1계정으로 운영하려합니다.
 @@@ v7부터는 실명 닉 제외 모두 삭제합니다. @@@
+     
+##### v7.2 hotfix  ######
+- 버그수정
+ -. 각성 조건이 병기에 맞게 공격력형과 속도형으로 
+        나뉘는 변경이 적용되지 않아 다시 적용했습니다.
+ -. 검기 이펙트가 보이지 않는 부분 수정
+ -. 검성 검기 범위딜이 제대로 적용되지 않는 부분 수정
+ -. 최대 병사수 표시가 제대로 나오지 않는 부분 수정
 
-##### 7.1 hotfix  ######
+- 밸런스패치
+ -. 검성 특수능력  피해 및 사거리 상향
+ -. 철벽 수문장 특수능력 쿨타임 감소
+ -. 뇌신창 연쇄피해 및 범위 상향
+ -. 폭풍의 궁수 튕김 수 +1
+ -. 절대영도 특수능력 쿨타임 감소
+ -. 레일건 특수능력 공력력/관통피해 상향
+ -. 가시성벽이 늑대왕 돌진에도 적용됩니다.
+
+     
+##### v7.1 hotfix  ######
 - 창이 정예/보스 우선타격하지 않던 버그 수정
 - 레벨업 즉시 카드선택이 뜨지 않던 버그 수정
 - 다른 브라우저로 접속 시 도감이 뜨지않던 버그 수정
@@ -338,7 +356,14 @@
  -. 강화화약특성 공격력 1.15 -> 1.2
  -. 용암분출 각성 범위 1.35 -> 1.3
  -. 폭뢰쇠뇌 각성 공격력 0.37 -> 0.35
- -. 검성 각성 공격력 0.45 -> 0.50
+ -. 검성: 검기 3갈래의 실제 경로에 공격력 65% 피해, 사거리 300px
+ -. 철벽 수문장: 4.5초마다 발동, 골렘 최대 35px 밀치기
+ -. 뇌신창: 연쇄 피해 65%, 연쇄마다 탐색 210px
+ -. 폭풍의 궁수: 튕김 +3 · 독화살: 초당 공격력 50%, 4초
+ -. 절대영도: 7.5초마다 발동
+ -. 레일건: 판정 폭 4배, 공격력 ×2, 관통당 피해 4% 감소
+ -. 증축: 단계당 최대 HP +150 · 가시 성벽: 늑대왕 돌진에도 반사
+ -. 각성 카드별 등장 조건 및 병기별 현재/최대 병사 수 표시 정리
      
 ## 🆕 새로운 요소
 
@@ -442,6 +467,12 @@ const WAVE_TIME = 22;              // 22초마다 웨이브 증가
 const DMG_MUL = 1.25;              // 공격력 강화 1단계 = ×1.25 (복리)
 const SPD_MUL = 1.15;              // 공격속도 강화 1단계 = ×1.15 (복리)
 const BASE_DMG_CAP = 10;           // 공격력 강화 한계 (각성하면 +3)
+const BAL = Object.freeze({ boltW: 8, railWidth: 4, railDmg: 2, railFalloff: 0.04,
+  poisonDps: 0.5, poisonTime: 4, thunderDmg: 0.65, thunderRange: 210,
+  stormChain: 3, guardPeriod: 4.5, guardGolem: 35, saintRange: 300, saintDmg: 0.65,
+  zeroPeriod: 7.5, expansionHp: 150 });
+const BASE_CASTLE_HP = 500;
+const pct = n => Math.round(n * 100);
 const TRAIT_CAP = 4;              // 병기마다 특성은 최대 4개
 const RARE_CHANCE = 0.12;          // 희귀 카드 확률
 const LEGEND_CHANCE = 0.03;        // 전설 카드 확률
@@ -474,13 +505,13 @@ const GAME_VERSION = "v7";         // 버전이 바뀌면 랭킹이 따로 집�
 const TYPES = {
   sword:    { name: "검사", icon: "⚔️", mode: "melee", damage: 25, interval: 1.2, speed: 0, range: 110,
               radius: 0, maxCount: 3, maxSpd: 6, color: "#f8fafc", rowY: 58,
-              desc: "성 앞 110px 반달 안의 모든 적을 벰. 범위 피해 분산·정예 저항을 받지 않음" },
+              desc: "성 앞 반달 안의 모든 적을 벰. 범위 피해 분산·정예 저항을 받지 않음" },
   archer:   { name: "궁수", icon: "🏹", mode: "single", damage: 11, interval: 0.75, speed: 700, range: 860,
               radius: 0, maxCount: 4, maxSpd: 6, color: "#fde68a", rowY: 116,
-              desc: "잡몹에 강함. 적을 잡으면 남은 피해로 다음 적 공격, 나는 적에게 피해 +30%" },
+              desc: "잡몹에 강함. 적을 잡으면 남은 피해로 다음 적 공격, 나는 적에게 추가피해" },
   spear:    { name: "창투척병", icon: "🔱", mode: "line", damage: 20, interval: 1.6, speed: 620, range: 360,
               radius: 0, maxCount: 3, maxSpd: 6, color: "#7dd3fc", rowY: 174, pierce: 3,
-              desc: "정예·보스에 강함. 사거리는 짧지만 3마리 관통, 정예·보스 피해 +40%" },
+              desc: "정예·보스 우선 타격(병사 별 순차). 사거리는 짧지만 3마리 관통, 정예·보스 피해 +40%" },
   fire:     { name: "화염병투척병", icon: "🔥", mode: "aoe", damage: 8, interval: 2.4, speed: 420, range: 640,
               radius: 60, maxCount: 3, maxSpd: 6, color: "#fb923c", rowY: 232, burn: 13, burnTime: 3,
               desc: "약한 범위 공격 + 3초 불길. 직접 적중할 때 화상 중첩(최대 5)" },
@@ -509,7 +540,7 @@ const TRAITS = {
   ],
   archer: [
     { id: "multi",  name: "다중 사격", desc: "한 번에 화살 +1발 (다른 적 조준)", mod: m => { m.multi += 1; } },
-    { id: "poison", name: "독화살", desc: "명중 시 3초간 초당 공격력 40% 독 (방어 무시)", mod: m => { m.poison += 0.4; } },
+    { id: "poison", name: "독화살", desc: `명중 시 ${BAL.poisonTime}초간 초당 공격력 ${pct(BAL.poisonDps)}% 독 (방어 무시)`, mod: m => { m.poison += BAL.poisonDps; } },
     { id: "pierce", name: "튕기는 화살", desc: "명중 후 근처 적 1명 추가 타격", mod: m => { m.chain += 1; } },
     { id: "aim",    name: "정조준", desc: "치명타 확률 +20%, 치명타 피해 2.5배", mod: m => { m.crit += 0.2; m.critMul = Math.max(m.critMul, 2.5); } },
     { id: "rapid",  name: "속사", desc: "공격속도 ×1.3", mod: m => { m.spd *= 1.3; } }
@@ -554,7 +585,7 @@ const TRAITS = {
 const EVOS = {
   sword: [
     { id: "bladeStorm", name: "칼날 폭풍", need: ["longBlade", "dual"], desc: "베기 범위 ×1.2, 추가 베기 피해 100%", mod: m => { m.range *= 1.2; m.doubleSlash = 1; } },
-    { id: "swordAura", name: "검기", need: ["longBlade", "armorBreak"], desc: "베기 끝에서 220px 검기 1개 발사, 공격력 65%", mod: m => { m.swordWave = 1; m.waveRange = 220; m.waveMul = 0.65; } },
+    { id: "swordAura", name: "검기", need: ["longBlade", "armorBreak"], desc: `베기마다 사거리 220px 검기 1개 발사\n검기가 지나가는 범위에 공격력 65% 피해`, mod: m => { m.swordWave = 1; m.waveRange = 220; m.waveMul = 0.65; } },
     { id: "bloodFeast", name: "피의 축제", need: ["dual", "lifesteal"], desc: "추가 베기 피해 100%, 처치 회복 0.8%", mod: m => { m.doubleSlash = 1; m.lifeSteal = 0.008; } },
     { id: "indomitable", name: "불굴", need: ["lifesteal", "counter"], desc: "분노 피해 증가 강화, 처치 회복 0.6%", mod: m => { m.counterMul = 0.5; m.lifeSteal = Math.max(m.lifeSteal, 0.006); } },
     { id: "iai", name: "일섬", need: ["armorBreak", "counter"], desc: "방어력 12 무시, 분노가 있으면 치명타", mod: m => { m.armorPen += 7; m.iai = true; } }
@@ -604,46 +635,46 @@ const EVOS = {
 };
 
 /*
-  ⚡ 각성: 진화 + 특성 4개 + 공격력 Lv5 이상이면 낮은 확률로 카드 등장
+  ⚡ 각성: 진화 + 특성 4개 + 카드별 공격력·공격속도 조건 충족 시 등장
   각성하면 강화 한계가 오르고(공격력 +3단계, 속도 +1단계, 병사 +1명) 특별한 공격이 생깁니다.
   aura: 성 위 병기 칸과 투사체에 쓰는 각성 색
 */
 const AWAKENS = {
   sword: [
-    { id: "swordSaint", name: "검성", aura: "#f8fafc", desc: "베기마다 사거리 250px 검기 3갈래\n각 검기는 공격력 50%", mod: m => { m.swordSaint = true; m.waveRange = 250; m.waveMul = 0.50; } },
-    { id: "guardian", name: "철벽 수문장", aura: "#60a5fa", desc: "6초마다 성 앞 적을 130px 선까지 밀어냄\n보스 면역, 골렘은 20px만 밀림", mod: m => { m.guardian = true; } }
+    { id: "swordSaint", name: "검성", need: { dmg: 5, spd: 0 }, aura: "#f8fafc", desc: `베기마다 사거리 ${BAL.saintRange}px 검기 3갈래 발사\n검기가 지나가는 범위에 공격력 ${pct(BAL.saintDmg)}% 피해 (한 번의 발사당 적마다 1회)`, mod: m => { m.swordSaint = true; m.waveRange = BAL.saintRange; m.waveMul = BAL.saintDmg; } },
+    { id: "guardian", name: "철벽 수문장", need: { dmg: 2, spd: 3 }, aura: "#60a5fa", desc: `${BAL.guardPeriod}초마다 성 앞 적을 130px 선까지 밀어냄\n보스 면역, 골렘은 최대 ${BAL.guardGolem}px 밀림`, mod: m => { m.guardian = true; } }
   ],
   archer: [
-    { id: "stormArcher", name: "폭풍의 궁수", aura: "#fbbf24", desc: "화살 +1발, 튕김 +2, 공격력 ×1.3\n남은 피해 이어가기 60%", mod: m => { m.multi += 1; m.chain += 2; m.dmg *= 1.3; m.carry = 0.6; } },
-    { id: "shadow",      name: "그림자 사수", aura: "#a855f7", desc: "6번째 공격마다 그림자 화살 발사\n(한 줄 무한 관통, 공격력 ×2.8 + 최대 체력 1.0%)", mod: m => { m.shadow = true; } }
+    { id: "stormArcher", name: "폭풍의 궁수", need: { dmg: 3, spd: 2 }, aura: "#fbbf24", desc: `화살 +1발, 튕김 +${BAL.stormChain}, 공격력 ×1.3\n남은 피해 이어가기 60%`, mod: m => { m.multi += 1; m.chain += BAL.stormChain; m.dmg *= 1.3; m.carry = 0.6; } },
+    { id: "shadow",      name: "그림자 사수", need: { dmg: 0, spd: 5 }, aura: "#a855f7", desc: "6번째 공격마다 그림자 화살 발사\n(한 줄 무한 관통, 공격력 ×2.8 + 최대 체력 1.0%)", mod: m => { m.shadow = true; } }
   ],
   spear: [
-    { id: "dragoon",     name: "용기병", aura: "#22d3ee", desc: "모든 창병이 보스를 최우선 공격\n관통 +6, 공격력 ×1.5, 정예·보스 피해 추가 +60%", mod: m => { m.pierce += 6; m.dmg *= 1.5; m.eliteMul += 0.6; m.lineW = 14; m.bossFocus = true; } },
-    { id: "thunderLord", name: "뇌신창", aura: "#facc15", desc: "창이 맞힐 때마다 번개가 주변 적 3명에게\n연쇄 (공격력 50%)", mod: m => { m.lightning = 3; } }
+    { id: "dragoon",     name: "용기병", need: { dmg: 5, spd: 0 }, aura: "#22d3ee", desc: "모든 창병이 보스를 최우선 공격\n관통 +6, 공격력 ×1.5, 정예·보스 피해 추가 +60%", mod: m => { m.pierce += 6; m.dmg *= 1.5; m.eliteMul += 0.6; m.lineW = 14; m.bossFocus = true; } },
+    { id: "thunderLord", name: "뇌신창", need: { dmg: 2, spd: 3 }, aura: "#facc15", desc: `창이 맞힐 때마다 주변 적에게 최대 3회 연쇄\n연쇄 1회당 탐색 ${BAL.thunderRange}px, 공격력 ${pct(BAL.thunderDmg)}%`, mod: m => { m.lightning = 3; } }
   ],
   fire: [
-    { id: "inferno",     name: "업화", aura: "#ef4444", desc: "불길 피해 ×2, 지속 +3초\n불길 위에서 죽은 적이 폭발", mod: m => { m.burnMul *= 2; m.burnTime += 3; m.burnExplode = true; } },
-    { id: "lava",        name: "용암 분출", aura: "#f97316", desc: "용암 지대: 범위 ×1.3, 불길 피해 ×1.6\n용암 위 적 이동속도 -50%", mod: m => { m.radius *= 1.3; m.burnMul *= 1.6; m.burnSlow = Math.max(m.burnSlow, 0.5); m.lava = true; } }
+    { id: "inferno",     name: "업화", need: { dmg: 5, spd: 0 }, aura: "#ef4444", desc: "불길 피해 ×2, 지속 +3초\n불길 위에서 죽은 적이 폭발", mod: m => { m.burnMul *= 2; m.burnTime += 3; m.burnExplode = true; } },
+    { id: "lava",        name: "용암 분출", need: { dmg: 2, spd: 3 }, aura: "#f97316", desc: "용암 지대: 범위 ×1.3, 불길 피해 ×1.6\n용암 위 적 이동속도 -50%", mod: m => { m.radius *= 1.3; m.burnMul *= 1.6; m.burnSlow = Math.max(m.burnSlow, 0.5); m.lava = true; } }
   ],
   ice: [
-    { id: "absZero",     name: "절대영도", aura: "#67e8f9", desc: "9초마다 전장 전체를 얼림\n(보스 외 1.5초 정지 + 공격력 ×5 피해)", mod: m => { m.zero = true; } },
-    { id: "glacier",     name: "빙하 창기사", aura: "#38bdf8", desc: "무한 관통 얼음 창으로 변경\n공격력 ×2.1, 냉기 피해 증가 +20%", mod: m => { m.line = true; m.pierce = 999; m.dmg *= 2.1; m.brittle += 0.2; m.lineW = 12; } }
+    { id: "absZero",     name: "절대영도", need: { dmg: 0, spd: 5 }, aura: "#67e8f9", desc: `${BAL.zeroPeriod}초마다 전장 전체를 얼림\n보스 외 1.5초 정지, 전장 전체에 공격력 ×5 피해`, mod: m => { m.zero = true; } },
+    { id: "glacier",     name: "빙하 창기사", need: { dmg: 5, spd: 0 }, aura: "#38bdf8", desc: "무한 관통 얼음 창으로 변경\n공격력 ×2.1, 냉기 피해 증가 +20%", mod: m => { m.line = true; m.pierce = 999; m.dmg *= 2.1; m.brittle += 0.2; m.lineW = 12; } }
   ],
   ballista: [
-    { id: "railgun",     name: "레일건", aura: "#e879f9", desc: "순식간에 화면을 꿰뚫는 광선\n공격력 ×1.9, 판정 폭 4배, 관통 감소 6%", mod: m => { m.dmg *= 1.9; m.boltW = 30; m.falloff = Math.min(m.falloff, 0.06); m.boltSpeed = 3200; } },
-    { id: "burstBolt",   name: "폭뢰 쇠뇌", aura: "#fb7185", desc: "볼트가 맞힐 때마다 폭발\n(반경 50, 공격력 35%)", mod: m => { m.boltBlast = 0.35; } }
+    { id: "railgun",     name: "레일건", need: { dmg: 5, spd: 0 }, aura: "#e879f9", desc: `순식간에 화면을 꿰뚫는 광선\n공격력 ×${BAL.railDmg}, 기본 볼트 판정 폭의 ${BAL.railWidth}배, 관통당 피해 ${pct(BAL.railFalloff)}% 감소`, mod: m => { m.dmg *= BAL.railDmg; m.boltW = BAL.boltW * BAL.railWidth; m.falloff = Math.min(m.falloff, BAL.railFalloff); m.boltSpeed = 3200; } },
+    { id: "burstBolt",   name: "폭뢰 쇠뇌", need: { dmg: 2, spd: 3 }, aura: "#fb7185", desc: "볼트가 맞힐 때마다 폭발\n(반경 50, 공격력 35%)", mod: m => { m.boltBlast = 0.35; } }
   ],
   cannon: [
-    { id: "meteor",      name: "궤도 포격", aura: "#fde047", desc: "3번째 포격마다 운석 낙하\n(범위 ×2.2, 공격력 ×3.5)", mod: m => { m.meteor = true; } },
-    { id: "artillery",   name: "자주포 부대", aura: "#a3e635", desc: "포탄 +2발, 공격속도 ×1.35, 공격력 ×1.05", mod: m => { m.multi += 2; m.spd *= 1.35; m.dmg *= 1.05; } }
+    { id: "meteor",      name: "궤도 포격", need: { dmg: 5, spd: 0 }, aura: "#fde047", desc: "3번째 포격마다 운석 낙하\n(범위 ×2.2, 공격력 ×3.5)", mod: m => { m.meteor = true; } },
+    { id: "artillery",   name: "자주포 부대", need: { dmg: 0, spd: 5 }, aura: "#a3e635", desc: "포탄 +2발, 공격속도 ×1.35, 공격력 ×1.05", mod: m => { m.multi += 2; m.spd *= 1.35; m.dmg *= 1.05; } }
   ]
 };
 
 // 성 강화(공용) 스킬
 const PERKS = {
-  expansion: { icon: "🧱", name: "증축", max: 5, desc: lv => `성 최대 HP +100 (${500 + lv * 100} → ${600 + lv * 100})` },
+  expansion: { icon: "🧱", name: "증축", max: 5, desc: lv => `성 최대 HP +${BAL.expansionHp} (${BASE_CASTLE_HP + lv * BAL.expansionHp} → ${BASE_CASTLE_HP + (lv + 1) * BAL.expansionHp})` },
   fort:      { icon: "🛡️", name: "요새화", max: 5, desc: lv => `성이 받는 피해 감소 ${lv * 10}% → ${(lv + 1) * 10}%` },
-  thorns:    { icon: "🌵", name: "가시 성벽", max: 5, desc: lv => `성을 때린 적 반사 피해 Lv${lv} → Lv${lv + 1}` },
+  thorns:    { icon: "🌵", name: "가시 성벽", max: 5, desc: lv => `성을 때린 적에게 반사 피해 (늑대왕 돌진 포함) Lv${lv} → Lv${lv + 1}` },
   emergency: { icon: "🔧", name: "긴급 수리", max: 99, desc: () => "성 HP 40% 즉시 회복" },
   crit:      { icon: "💥", name: "정밀 조준", max: 6, desc: lv => `모든 공격 치명타 확률 ${lv * 5}% → ${(lv + 1) * 5}%` },
   study:     { icon: "📚", name: "전술 연구", max: 4, desc: lv => `경험치 획득 +${lv * 15}% → +${(lv + 1) * 15}%` }
@@ -960,8 +991,7 @@ function codexCondition(kind, key, item) {
     const names = item.need.map(id => TRAITS[key].find(t => t.id === id).name).join(" + ");
     return `조건: 특성 ${names}`;
   }
-  if (key === "sword" && item.id === "guardian") return "조건: 진화 1개 + 특성 4개 + 공격속도 Lv3 + 공격력 Lv2";
-  return "조건: 진화 1개 + 특성 4개 + 공격력 Lv5";
+  return `조건: ${awakeningCondition(item)}`;
 }
 function codexItems() {
   const out=[];
@@ -1273,7 +1303,7 @@ let startPresses = 0;          // 게임 시작 후 메인 시작 버튼을 누�
 let hiddenSpeed = false;       // 메인 시작 버튼 5회 입력 시 기본의 2배인 4배속
 function newGameData() {
   const data = {
-    hp: 500, maxHp: 500,
+    hp: BASE_CASTLE_HP, maxHp: BASE_CASTLE_HP,
     xp: 0, needXp: 3, level: 1, pendingLevels: 0,
     kills: 0, time: 0, wave: 1,
     spawnTimer: 1.2, shake: 0, roar: 0, flash: 0, flashColor: "#fff",
@@ -1293,7 +1323,7 @@ function newGameData() {
       dmgLv: 0, spdLv: 0,
       traits: new Set(), evo: null, awaken: null, awakenWave: null,
       timers: key === "archer" ? [0.3] : [],
-      shotN: 0, zeroT: 9, guardianT: 6,
+      shotN: 0, zeroT: BAL.zeroPeriod, guardianT: BAL.guardPeriod,
       echoes: [], counterStacks: 0,
       m: null
     };
@@ -1314,7 +1344,7 @@ function baseMods(key) {
     brittle: key === "ice" ? 0.2 : 0,             // 얼음: 냉기 받는 피해 +20%
     frostZone: false, zero: false,
     line: t.mode === "line", lineW: 8, pierce: t.pierce || 0,
-    falloff: t.falloff || 0, boltW: 8, boltSpeed: t.speed, mark: 0, boltBlast: 0,
+    falloff: t.falloff || 0, boltW: BAL.boltW, boltSpeed: t.speed, mark: 0, boltBlast: 0,
     incend: false, incendMul: 1, split: 0, knock: 0, meteor: false,
     lightning: 0, shadow: false, bossFocus: false,
     doubleSlash: 0, armorBreak: 0, lifeSteal: 0, counter: false, counterMul: 0.35, iai: false,
@@ -1340,11 +1370,17 @@ const getInterval = key => TYPES[key].interval / g.units[key].m.spd;
 const getBurnDps  = () => TYPES.fire.burn * g.units.fire.m.dmg * g.units.fire.m.burnMul;
 const basicCount  = u => u.dmgLv + u.spdLv + Math.max(0, u.count - 1);
 const traitsOpen  = u => u.count > 0 && basicCount(u) >= 2;
+function awakeningCondition(aw, u = null) {
+  const lv = (label, field, need) => u ? `${label} Lv${Math.min(u[field], need)}/${need}` : `${label} Lv${need}`;
+  const parts = [u ? `진화 ${u.evo ? 1 : 0}/1` : "진화 1개", u ? `특성 ${u.traits.size}/${TRAIT_CAP}` : `특성 ${TRAIT_CAP}개`];
+  if (aw.need.dmg) parts.push(lv("공격력", "dmgLv", aw.need.dmg));
+  if (aw.need.spd) parts.push(lv("공격속도", "spdLv", aw.need.spd));
+  return parts.join(u ? " · " : " + ");
+}
 const awakenOpen = (key, awakenId) => {
-  const u = g.units[key];
-  if (!u.evo || u.awaken || u.traits.size < TRAIT_CAP) return false;
-  if (key === "sword" && awakenId === "guardian") return u.dmgLv >= 2 && u.spdLv >= 3;
-  return u.dmgLv >= 5;
+  const u = g.units[key], aw = AWAKENS[key].find(a => a.id === awakenId);
+  return !!(aw && u.count > 0 && u.evo && !u.awaken && u.traits.size >= TRAIT_CAP &&
+    u.dmgLv >= aw.need.dmg && u.spdLv >= aw.need.spd);
 };
 const awakenOf    = key => { const u = g.units[key]; return u.awaken ? AWAKENS[key].find(a => a.id === u.awaken) : null; };
 // 랭킹·결과에 쓰는 빌드 이름 (각성 > 진화)
@@ -1632,7 +1668,7 @@ function guardianPush() {
   let pushed=0;
   for (const e of g.enemies) {
     if (e.dead || e.boss || e.x-e.r>line) continue;
-    if (e.kind === "golem") e.x=Math.min(W+20,e.x+20);
+    if (e.kind === "golem") e.x=Math.min(W+20,e.x+BAL.guardGolem);
     else e.x=Math.max(e.x,line+e.r);
     e.knockCd=1; pushed++;
   }
@@ -1656,14 +1692,49 @@ function swordSlash(mult=1, echo=false) {
   for (const e of hits) {
     damageEnemy(e,dmg,{key:"sword",direct:true,forceCrit:m.iai&&charged});
     if (!e.dead && m.armorBreak) { e.armorShred=Math.max(e.armorShred,m.armorBreak); e.armorShredT=5; }
+    if (state !== "playing") break;
   }
-  const waveCount=m.swordSaint?3:m.swordWave?1:0;
-  if (waveCount) {
-    const far=g.enemies.filter(e=>!e.dead&&e.x-e.r>CASTLE_X+m.range&&e.x-e.r<=CASTLE_X+m.waveRange).sort((a,b)=>a.x-b.x);
-    for (let i=0;i<Math.min(waveCount,far.length);i++) damageEnemy(far[i],dmg*m.waveMul,{key:"sword",direct:true});
-  }
+    if (m.swordSaint || m.swordWave) launchSwordWaves(m, dmg);
   g.effects.push({type:"slash",x:CASTLE_X+10,y:(FIELD_TOP+FIELD_BOTTOM)/2,r:m.range,life:.22,max:.22,color:charged?"#fbbf24":"#f8fafc"});
   if (!echo && m.doubleSlash) u.echoes.push({time:.2,mul:m.doubleSlash});
+}
+function launchSwordWaves(m, dmg) {
+  const hit = new Set();
+  const angles = m.swordSaint ? [-0.38, 0, 0.38] : [0];
+  // 검기 한 갈래 = 베기 반달의 절반 크기 반달 칼날. 지나가는 범위 전체에 피해
+  const halfWidth = Math.round(m.range * 0.45);
+  for (const angle of angles) {
+    g.shots.push({ mode: "swordWave", key: "sword", x: CASTLE_X + m.range,
+      y: (FIELD_TOP + FIELD_BOTTOM) / 2, vx: Math.cos(angle), vy: Math.sin(angle),
+      speed: 560, travelled: 0, maxDist: Math.max(0, m.waveRange - m.range), hit, dmg: dmg * m.waveMul,
+      halfWidth, color: m.swordSaint ? "#7dd3fc" : "#fde68a" });
+  }
+}
+function updateSwordWave(s, dt) {
+  const step = Math.min(s.speed * dt, s.maxDist - s.travelled);
+  const hits = [];
+  for (const e of g.enemies) {
+    if (e.dead || s.hit.has(e)) continue;
+    const dx = e.x - s.x, dy = e.y - s.y;
+    const along = dx * s.vx + dy * s.vy;
+    const side = Math.abs(-dx * s.vy + dy * s.vx);
+    // A vertical blade segment sweeps the path; intersect the enemy circle.
+    const extra = Math.max(0, side - s.halfWidth);
+    if (extra > e.r) continue;
+    const reach = Math.sqrt(Math.max(0, e.r * e.r - extra * extra));
+    if (along + reach < 0 || along - reach > step) continue;
+    hits.push([Math.max(0, along - reach), e]);
+  }
+  hits.sort((a, b) => a[0] - b[0]);
+  let walked = step;
+  for (const [distance, e] of hits) {
+    if (e.dead || s.hit.has(e)) continue;
+    s.hit.add(e);
+    damageEnemy(e, s.dmg, { key: "sword", direct: true });
+    if (state !== "playing") { walked = distance; break; }
+  }
+  s.x += s.vx * walked; s.y += s.vy * walked; s.travelled += walked;
+  if (s.travelled >= s.maxDist - 1e-8) s.done = true;
 }
 function updateUnits(dt, targets) {
   const tick = g.roar > 0 ? dt * 0.65 : dt;   // 화룡 포효 중에는 공격이 느려짐
@@ -1675,8 +1746,11 @@ function updateUnits(dt, targets) {
     if (key === "sword") {
       for (const e of u.echoes) e.time -= tick;
       const ready=u.echoes.filter(e=>e.time<=0); u.echoes=u.echoes.filter(e=>e.time>0);
-      ready.forEach(e=>swordSlash(e.mul,true));
-      if (m.guardian) { u.guardianT-=tick; if (u.guardianT<=0) { guardianPush(); u.guardianT+=6; } }
+      for (let i = 0; i < ready.length; i++) {
+          swordSlash(ready[i].mul, true);
+          if (state !== "playing") { u.echoes.unshift(...ready.slice(i + 1)); return; }
+        }
+      if (m.guardian) { u.guardianT-=tick; if (u.guardianT<=0) { guardianPush(); u.guardianT+=BAL.guardPeriod; } }
     }
     const reach = CASTLE_X + m.range;
     let inRange = key === "sword"
@@ -1685,7 +1759,7 @@ function updateUnits(dt, targets) {
     // 절대영도 (얼음 각성): 일정 시간마다 전장 전체를 얼림
     if (m.zero) {
       u.zeroT -= tick;
-      if (u.zeroT <= 0) { absoluteZero(); u.zeroT = 9; }
+      if (u.zeroT <= 0) { absoluteZero(); u.zeroT += BAL.zeroPeriod; }
       if (state !== "playing") return;
     }
     let focusedBoss = null;
@@ -1910,7 +1984,7 @@ function processLevelUpsNow() {
 }
 function applyPoison(e, dps, spread) {
   e.poisonDps = Math.max(e.poisonTime > 0 ? e.poisonDps : 0, dps);
-  e.poisonTime = 3;
+  e.poisonTime = BAL.poisonTime;
   e.poisonSpread = e.poisonSpread || spread;
 }
 function applyBurnStack(e) {
@@ -1996,11 +2070,11 @@ function lineHit(s, e) {
     const done = new Set([e]);
     let from = e;
     for (let k = 0; k < m.lightning; k++) {
-      const next = nearestEnemy(from.x, from.y, 170, done);
+      const next = nearestEnemy(from.x, from.y, BAL.thunderRange, done);
       if (!next) break;
       done.add(next);
       g.effects.push({ type: "zap", x: from.x, y: from.y, x2: next.x, y2: next.y, life: 0.25, max: 0.25 });
-      damageEnemy(next, s.dmg * 0.5, { key: "spear", direct: true });
+      damageEnemy(next, s.dmg * BAL.thunderDmg, { key: "spear", direct: true });
       from = next;
     }
     Sound.play("zap");
@@ -2010,7 +2084,9 @@ function updateShots(dt) {
   for (const s of g.shots) {
     if (state !== "playing") break;
     if (s.done) continue;
-    if (s.mode === "aoe") {
+    if (s.mode === "swordWave") {
+      updateSwordWave(s, dt);
+    } else if (s.mode === "aoe") {
       s.t += dt;
       const p = Math.min(1, s.t / s.dur);
       s.x = s.sx + (s.tx - s.sx) * p;
@@ -2281,6 +2357,9 @@ function updateBoss(e, dt) {
     }
   }
 }
+function reflectCastleHit(e) {
+  if (g.perks.thorns) damageEnemy(e, (12 + g.wave * 2) * g.perks.thorns, { dot: true, src: "thorns" });
+}
 function updateEnemies(dt) {
   const reduce = 1 - g.perks.fort * 0.1;
   for (const e of g.enemies) e.armorBuff = 0;
@@ -2317,7 +2396,9 @@ function updateEnemies(dt) {
       b.dash = 0;
       b.stun = 0.8;
       e.x += 200;
+      reflectCastleHit(e);
       Sound.play("hit");
+      if (state !== "playing") break;
     } else if (!(b && b.def.stopX)) {
       // 성에 도착: 1초마다 공격
       e.attackTimer -= dt;
@@ -2325,7 +2406,7 @@ function updateEnemies(dt) {
         const dmg = e.dmg * reduce * (e.frenzy > 0 ? 1.5 : 1);
         g.hp -= dmg;
         chargeSwordCounter();
-        if (g.perks.thorns) damageEnemy(e,(12+g.wave*2)*g.perks.thorns,{dot:true,src:"thorns"});
+        reflectCastleHit(e);
         Sound.play("hit");
         e.attackTimer = 1;
         g.shake = 0.15;
@@ -2510,7 +2591,7 @@ function describe(c) {
   if (c.kind === "awaken") {
     const aw = AWAKENS[c.key].find(a => a.id === c.id);
     return { tag: "⚡ 각성", title: `⚡ ${t.icon} ${aw.name}`,
-             desc: `${aw.desc}\n강화 한계 상승: 공격력 +3단계, 속도 +1단계, 병사 +1명\n(${t.name}의 각성은 1개만 가능)` };
+             desc: `${aw.desc}\n조건: ${awakeningCondition(aw)}\n강화 한계 상승: 공격력 +3단계, 속도 +1단계, 병사 +1명\n(${t.name}의 각성은 1개만 가능)` };
   }
   if (c.kind === "evo") {
     const ev = EVOS[c.key].find(e => e.id === c.id);
@@ -2641,7 +2722,7 @@ function applyChoice(index) {
     for (let i = 0; i < times; i++) {
       if (g.perks[c.key] >= PERKS[c.key].max) break;
       g.perks[c.key] += 1;
-      if (c.key === "expansion") { g.maxHp += 100; g.hp = Math.min(g.maxHp, g.hp + 100); }
+      if (c.key === "expansion") { g.maxHp += BAL.expansionHp; g.hp = Math.min(g.maxHp, g.hp + BAL.expansionHp); }
       if (c.key === "emergency") g.hp = Math.min(g.maxHp, g.hp + g.maxHp * 0.4);
     }
     if (c.rarity === "legend") g.hp = g.maxHp;
@@ -2712,7 +2793,7 @@ function renderRoster() {
     const info = document.createElement("div");
     if (u.count) {
       const dps = getDamage(key) / getInterval(key) * u.count * u.m.multi;
-      let text = `${u.count}/${countCap(key, u)}명 · 한 발 ${Math.round(getDamage(key))} · 간격 ${getInterval(key).toFixed(2)}초\n` +
+      let text = `병사 ${u.count}명 / 최대 ${countCap(key, u)}명 · 한 발 ${Math.round(getDamage(key))} · 간격 ${getInterval(key).toFixed(2)}초\n` +
                  `대략 DPS ${Math.round(dps)} · 공격력 Lv${u.dmgLv}/${dmgCap(u)} · 속도 Lv${u.spdLv}/${spdCap(key, u)}\n`;
       if (traitsOpen(u)) {
         const names = TRAITS[key].filter(x => u.traits.has(x.id)).map(x => x.name);
@@ -2732,10 +2813,10 @@ function renderRoster() {
         aw.className = "awk";
         aw.textContent = `⚡ ${awakenOf(key).name}`;
         info.appendChild(aw);
-      } else if (u.evo) {
+      } else {
         const hint = document.createElement("div");
         hint.style.color = "#94a3b8";
-        hint.textContent = `각성 조건: 특성 ${Math.min(4, u.traits.size)}/4 · 공격력 Lv${Math.min(5, u.dmgLv)}/5`;
+        hint.textContent = AWAKENS[key].map(a => `${a.name}: ${awakeningCondition(a, u)}`).join("\n");
         info.appendChild(hint);
       }
     } else {
@@ -2998,12 +3079,32 @@ function drawBoss(e) {
   }
 }
 function drawShot(s) {
+  if (s.mode === "swordWave") {
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(Math.atan2(s.vy, s.vx));
+    const w = s.halfWidth;
+    ctx.shadowBlur = 14; ctx.shadowColor = s.color;
+    // 반달 칼날: 진행 방향으로 볼록한 초승달 + 흰 칼날선 + 잔상
+    ctx.fillStyle = s.color;
+    for (const [off, a] of [[-18, 0.18], [-9, 0.35], [0, 0.85]]) {
+      ctx.globalAlpha = a;
+      ctx.beginPath(); ctx.moveTo(off - w * 0.15, -w);
+      ctx.quadraticCurveTo(off + w * 0.55, 0, off - w * 0.15, w);
+      ctx.quadraticCurveTo(off + w * 0.12, 0, off - w * 0.15, -w); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "#f8fafc"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-w * 0.15, -w); ctx.quadraticCurveTo(w * 0.55, 0, -w * 0.15, w); ctx.stroke();
+    ctx.restore();
+    return;
+  }
   const t = TYPES[s.key];
   const aw = awakenOf(s.key);
   const glow = aw ? aw.aura : null;
   if (s.mode === "bolt") {
     const m = g.units.ballista.m;
-    const wide = m.boltW > 8;
+    const wide = m.boltW > BAL.boltW;
     ctx.strokeStyle = glow || (wide ? "#fde047" : t.color);
     ctx.lineWidth = wide ? 12 : 5;
     ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - (m.boltSpeed > 2000 ? 260 : wide ? 70 : 40), s.y); ctx.stroke();
@@ -3248,7 +3349,7 @@ $("shieldResText").textContent = Math.round((1 - SHIELD_AOE_RES) * 100);
 $("modalRank").hidden = !rankEnabled();
 renderRankBoards();
 loadRanking();
-const NOTICE_KEY = "castle_notice_v7";
+const NOTICE_KEY = "castle_notice_v7_2";
 if (localStorage.getItem(NOTICE_KEY) !== "1") {
 
   $("modal").hidden = true;
