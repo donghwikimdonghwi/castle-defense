@@ -335,6 +335,7 @@
  -. 최대 병사수 표시가 제대로 나오지 않는 부분 수정
 
 - 밸런스패치
+ -. 검사 기본 성능 및 특성/진화 일부 상향
  -. 검성 특수능력  피해 및 사거리 상향
  -. 철벽 수문장 특수능력 쿨타임 감소
  -. 뇌신창 연쇄피해 및 범위 상향
@@ -460,7 +461,7 @@ const SPD_MUL = 1.15;              // 공격속도 강화 1단계 = ×1.15 (복�
 const BASE_DMG_CAP = 10;           // 공격력 강화 한계 (각성하면 +3)
 const BAL = Object.freeze({ boltW: 8, railWidth: 4, railDmg: 2, railFalloff: 0.04,
   poisonDps: 0.5, poisonTime: 4, thunderDmg: 0.65, thunderRange: 210,
-  stormChain: 3, guardPeriod: 4.5, guardGolem: 35, saintRange: 300, saintDmg: 0.65,
+  stormChain: 3, guardPeriod: 4.5, guardGolem: 35, saintRange: 300, saintDmg: 0.7,
   zeroPeriod: 7.5, expansionHp: 150 });
 const BASE_CASTLE_HP = 500;
 const pct = n => Math.round(n * 100);
@@ -494,7 +495,7 @@ const GAME_VERSION = "v7";         // 버전이 바뀌면 랭킹이 따로 집�
   maxCount: 병사 최대 수, maxSpd: 공격속도 강화 최대 단계 (각성하면 한계 상승)
 */
 const TYPES = {
-  sword:    { name: "검사", icon: "⚔️", mode: "melee", damage: 25, interval: 1.2, speed: 0, range: 110,
+  sword:    { name: "검사", icon: "⚔️", mode: "melee", damage: 30, interval: 1.1, speed: 0, range: 110,
               radius: 0, maxCount: 3, maxSpd: 6, color: "#f8fafc", rowY: 58,
               desc: "성 앞 반달 안의 모든 적을 벰. 범위 피해 분산·정예 저항을 받지 않음" },
   archer:   { name: "궁수", icon: "🏹", mode: "single", damage: 11, interval: 0.75, speed: 700, range: 860,
@@ -523,7 +524,7 @@ const TYPES = {
 */
 const TRAITS = {
   sword: [
-    { id: "longBlade", name: "긴 칼날", desc: "베기 범위 +30%", mod: m => { m.range *= 1.3; } },
+    { id: "longBlade", name: "긴 칼날", desc: "베기 범위 +30%, 공격력 ×1.1 ", mod: m => { m.range *= 1.3; m.dmg *= 1.1; } },
     { id: "dual", name: "쌍검", desc: "0.2초 뒤 공격력 100%로 한 번 더 벰", mod: m => { m.doubleSlash = 1; } },
     { id: "armorBreak", name: "갑옷 가르기", desc: "방어력 5 무시, 맞은 적 방어력 5초간 -3", mod: m => { m.armorPen += 5; m.armorBreak = 3; } },
     { id: "lifesteal", name: "흡혈", desc: "검사로 처치 시 성 최대 HP의 0.4% 회복", mod: m => { m.lifeSteal = 0.004; } },
@@ -575,10 +576,10 @@ const TRAITS = {
 
 const EVOS = {
   sword: [
-    { id: "bladeStorm", name: "칼날 폭풍", need: ["longBlade", "dual"], desc: "베기 범위 ×1.2, 추가 베기 피해 100%", mod: m => { m.range *= 1.2; m.doubleSlash = 1; } },
+    { id: "bladeStorm", name: "칼날 폭풍", need: ["longBlade", "dual"], desc: "베기 범위 ×1.3, 추가 베기 피해 125%", mod: m => { m.range *= 1.3; m.doubleSlash = 1.25; } },
     { id: "swordAura", name: "검기", need: ["longBlade", "armorBreak"], desc: `베기마다 사거리 220px 검기 1개 발사\n검기가 지나가는 범위에 공격력 65% 피해`, mod: m => { m.swordWave = 1; m.waveRange = 220; m.waveMul = 0.65; } },
-    { id: "bloodFeast", name: "피의 축제", need: ["dual", "lifesteal"], desc: "추가 베기 피해 100%, 처치 회복 0.8%", mod: m => { m.doubleSlash = 1; m.lifeSteal = 0.008; } },
-    { id: "indomitable", name: "불굴", need: ["lifesteal", "counter"], desc: "분노 피해 증가 강화, 처치 회복 0.6%", mod: m => { m.counterMul = 0.5; m.lifeSteal = Math.max(m.lifeSteal, 0.006); } },
+    { id: "bloodFeast", name: "피의 축제", need: ["dual", "lifesteal"], desc: "추가 베기 피해 100%, 처치 회복 1%", mod: m => { m.doubleSlash = 1; m.lifeSteal = 0.01; } },
+    { id: "indomitable", name: "불굴", need: ["lifesteal", "counter"], desc: "분노 피해 증가 강화, 처치 회복 0.5%", mod: m => { m.counterMul = 0.5; m.lifeSteal = Math.max(m.lifeSteal, 0.005); } },
     { id: "iai", name: "일섬", need: ["armorBreak", "counter"], desc: "방어력 12 무시, 분노가 있으면 치명타", mod: m => { m.armorPen += 7; m.iai = true; } }
   ],
   archer: [
@@ -636,7 +637,7 @@ const AWAKENS = {
     { id: "guardian", name: "철벽 수문장", need: { dmg: 2, spd: 3 }, aura: "#60a5fa", desc: `${BAL.guardPeriod}초마다 성 앞 적을 130px 선까지 밀어냄\n보스 면역, 골렘은 최대 ${BAL.guardGolem}px 밀림`, mod: m => { m.guardian = true; } }
   ],
   archer: [
-    { id: "stormArcher", name: "폭풍의 궁수", need: { dmg: 3, spd: 2 }, aura: "#fbbf24", desc: `화살 +1발, 튕김 +${BAL.stormChain}, 공격력 ×1.3\n남은 피해 이어가기 60%`, mod: m => { m.multi += 1; m.chain += BAL.stormChain; m.dmg *= 1.3; m.carry = 0.6; } },
+    { id: "stormArcher", name: "폭풍의 궁수", need: { dmg: 3, spd: 2 }, aura: "#fbbf24", desc: `화살 +1발, 튕김 +${BAL.stormChain}, 공격력 ×1.4\n남은 피해 이어가기 60%`, mod: m => { m.multi += 1; m.chain += BAL.stormChain; m.dmg *= 1.4; m.carry = 0.6; } },
     { id: "shadow",      name: "그림자 사수", need: { dmg: 0, spd: 5 }, aura: "#a855f7", desc: "6번째 공격마다 그림자 화살 발사\n(한 줄 무한 관통, 공격력 ×2.8 + 최대 체력 1.0%)", mod: m => { m.shadow = true; } }
   ],
   spear: [
