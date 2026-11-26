@@ -593,7 +593,7 @@ const EVOS = {
 */
 const AWAKENS = {
   sword: [
-    { id: "swordSaint", name: "검성", need: { dmg: 5, spd: 0 }, aura: "#f8fafc", desc: `베기마다 사거리 ${BAL.saintRange}px 검기 3갈래 발사\n검기가 지나가는 범위에 공격력 ${pct(BAL.saintDmg)}% 피해\n비행 적 타격, 보스 피해 ×1.5 + 최대 HP 0.2%`, mod: m => { m.swordSaint = true; m.waveRange = BAL.saintRange; m.waveMul = BAL.saintDmg; } },
+    { id: "swordSaint", name: "검성", need: { dmg: 5, spd: 0 }, aura: "#f8fafc", desc: `베기마다 사거리 ${BAL.saintRange}px 검기 3갈래 발사\n검기가 지나가는 범위에 공격력 ${pct(BAL.saintDmg)}% 피해\n비행 적 타격, 보스 피해 ×1.5 + 최대 HP 0.18%`, mod: m => { m.swordSaint = true; m.waveRange = BAL.saintRange; m.waveMul = BAL.saintDmg; } },
     { id: "guardian", name: "철벽 수문장", need: { dmg: 2, spd: 3 }, aura: "#60a5fa", desc: `정예 피해 ×2, ${BAL.guardPeriod}초마다 성 앞 적을 130px 선까지 밀어냄\n보스 면역, 골렘은 최대 ${BAL.guardGolem}px 밀림`, mod: m => { m.guardian = true; m.eliteOnlyMul = 2; } }
   ],
   archer: [
@@ -1706,7 +1706,7 @@ function updateSwordWave(s, dt) {
   for (const [distance, e] of hits) {
     if (e.dead || s.hit.has(e)) continue;
     s.hit.add(e);
-    const waveDmg = s.swordSaint && e.boss ? s.dmg * 1.5 + e.maxHp * 0.002 : s.dmg;
+    const waveDmg = s.swordSaint && e.boss ? s.dmg * 1.5 + e.maxHp * 0.0016 : s.dmg;
     damageEnemy(e, waveDmg, { key: "sword", direct: true });
     if (state !== "playing") { walked = distance; break; }
   }
