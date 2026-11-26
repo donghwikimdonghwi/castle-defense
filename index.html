@@ -420,7 +420,7 @@ const SPD_MUL = 1.15;              // 공격속도 강화 1단계 = ×1.15 (복�
 const BASE_DMG_CAP = 10;           // 공격력 강화 한계 (각성하면 +3)
 const BAL = Object.freeze({ boltW: 8, railWidth: 4, railDmg: 2, railFalloff: 0.04,
   poisonDps: 0.5, poisonTime: 4, thunderDmg: 0.65, thunderRange: 210,
-  stormChain: 5, guardPeriod: 4.5, guardGolem: 35, saintRange: 430, saintDmg: 0.85,
+  stormChain: 5, guardPeriod: 4.5, guardGolem: 35, saintRange: 430, saintDmg: 0.8,
   zeroPeriod: 7.5, expansionHp: 150,
   stormCarry: 1, railElite: 0.3, dragonLateWave: 40, dragonLateGrowth: 0.6 });
 const BASE_CASTLE_HP = 500;
@@ -514,12 +514,12 @@ const TRAITS = {
   ice: [
     { id: "deep",    name: "혹한", desc: "둔화 40% → 60%", mod: m => { m.slow = Math.max(m.slow, 0.6); } },
     { id: "long",    name: "긴 냉기", desc: "둔화 시간 +1.5초", mod: m => { m.slowTime += 1.5; } },
-    { id: "shard",   name: "얼음 파편", desc: "공격력 ×2", mod: m => { m.dmg *= 2; } },
+    { id: "shard",   name: "얼음 파편", desc: "공격력 ×1.8", mod: m => { m.dmg *= 1.8; } },
     { id: "wideI",   name: "넓은 냉기", desc: "범위 ×1.3", mod: m => { m.radius *= 1.3; } },
     { id: "brittle", name: "취약", desc: "냉기 받는 피해 증가 +20% → +40%", mod: m => { m.brittle += 0.2; } }
   ],
   ballista: [
-    { id: "bigBolt", name: "대형 볼트", desc: "공격력 ×1.5", mod: m => { m.dmg *= 1.5; } },
+    { id: "bigBolt", name: "대형 볼트", desc: "공격력 ×1.8", mod: m => { m.dmg *= 1.8; } },
     { id: "steel",   name: "강철 촉", desc: "방어력 8 무시", mod: m => { m.armorPen += 8; } },
     { id: "keep",    name: "유지력", desc: "관통할 때 피해 감소 12% → 6%", mod: m => { m.falloff = Math.min(m.falloff, 0.06); } },
     { id: "twinB",   name: "쌍발", desc: "볼트 +1발 (옆 줄)", mod: m => { m.multi += 1; } },
