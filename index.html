@@ -598,7 +598,7 @@ const AWAKENS = {
   ],
   archer: [
     { id: "stormArcher", name: "폭풍의 궁수", need: { dmg: 3, spd: 2 }, aura: "#fbbf24", desc: `화살 +2발, 튕김 +${BAL.stormChain}, 공격력 ×1.4\n남은 피해 이어가기 ${pct(BAL.stormCarry)}%\n화살 12회 적중마다 폭풍 낙뢰`, mod: m => { m.multi += 2; m.chain += BAL.stormChain; m.dmg *= 1.4; m.carry = BAL.stormCarry; m.stormLightning = true; } },
-    { id: "shadow",      name: "그림자 사수", need: { dmg: 0, spd: 5 }, aura: "#a855f7", desc: "6번째 공격마다 그림자 화살 발사\n(한 줄 무한 관통, 공격력 ×2.8 + 최대 체력 1.0%)", mod: m => { m.shadow = true; } }
+    { id: "shadow",      name: "그림자 사수", need: { dmg: 0, spd: 5 }, aura: "#a855f7", desc: "6번째 공격마다 그림자 화살 발사\n(한 줄 무한 관통, 공격력 ×2.5 + 최대 체력 1.0%)", mod: m => { m.shadow = true; } }
   ],
   spear: [
     { id: "dragoon",     name: "용기병", need: { dmg: 5, spd: 0 }, aura: "#22d3ee", desc: "모든 창병이 보스를 최우선 공격\n무한 관통, 공격력 ×1.5, 정예·보스 피해 추가 +60%\n보스 직접 적중 시 최대 HP 0.075% 추가 피해", mod: m => { m.pierce = 999; m.dmg *= 1.5; m.eliteMul += 0.6; m.lineW = 14; m.bossFocus = true; m.dragoonHpDamage = 0.00075; } },
@@ -1779,7 +1779,7 @@ function launch(key, target, j, shotN) {
   if (key === "archer" && m.shadow && shotN && shotN % 6 === 0) {
     const dx = target.x - ox, dy = target.y - oy, len = Math.hypot(dx, dy) || 1;
     g.shots.push({ mode: "line", key, x: ox, y: oy, vx: dx / len, vy: dy / len, speed: 900, travelled: 0,
-                   maxDist: 1100, hit: new Set(), hits: 0, pierce: 999, dmg: dmg * 2.8, w: 14, hpPct: 0.01, shadow: true });
+                   maxDist: 1100, hit: new Set(), hits: 0, pierce: 999, dmg: dmg * 2.5, w: 14, hpPct: 0.01, shadow: true });
     return;
   }
   if (key === "ballista") {
