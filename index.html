@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>작은 성 지키기 v7.2 - 도감과 검사</title>
+<title>작은 성 지키기 v7.3 - 도감과 검사</title>
 <style>
   * { box-sizing: border-box; }
   :root {
@@ -210,7 +210,7 @@
 <main class="app">
   <header>
     <div>
-      <h1>🏰 작은 성 지키기 v7.2</h1>
+      <h1>🏰 작은 성 지키기 v7.3</h1>
       <p class="subtitle">특성으로 진화하고, 각성으로 한계를 넘어 랭킹 1위에 도전하세요</p>
     </div>
     <span id="stateBadge" class="badge" data-state="idle">⏳ 시작 대기</span>
@@ -282,7 +282,7 @@
 <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div id="modalBox" class="modal-box">
     <h2 id="modalTitle">🏰 성을 지켜라!</h2>
-    <p id="modalText">처음에는 궁수 한 명뿐입니다.
+    <p id="modalText">시작할 때 무작위 병기 3개 중 하나를 고릅니다.
 레벨업마다 카드 3장 중 하나를 고르세요.
 실명 외 닉네임은 삭제합니다.
 개발자: 김동휘</p>
@@ -323,41 +323,25 @@
     <p>
 # 🏰 작은 성 지키기 v7.1 패치노트
 
-!!중요!! 닉네임/데이터 관리를 위해 1인 1계정으로 운영하려합니다.
+!!중요!! 닉네임/데이터 관리를 위해 1인 1계정으로 운영하려합니다. 
 @@@ v7부터는 실명 닉 제외 모두 삭제합니다. @@@
-     
-##### v7.2 hotfix  ######
-- 버그수정
- -. 각성 조건이 병기에 맞게 공격력형과 속도형으로 
-        나뉘는 변경이 적용되지 않아 다시 적용했습니다.
- -. 검기 이펙트가 보이지 않는 부분 수정
- -. 검성 검기 범위딜이 제대로 적용되지 않는 부분 수정
- -. 최대 병사수 표시가 제대로 나오지 않는 부분 수정
 
-- 밸런스패치
- -. 검사 기본 성능 및 특성/진화 일부 상향
- -. 검성 특수능력  피해 및 사거리 상향
- -. 철벽 수문장 특수능력 쿨타임 감소
- -. 뇌신창 연쇄피해 및 범위 상향
- -. 폭풍의 궁수 튕김 수 +1
- -. 절대영도 특수능력 쿨타임 감소
- -. 레일건 특수능력 공력력/관통피해 상향
- -. 가시성벽이 늑대왕 돌진에도 적용됩니다.
-     
-##### v7.1 hotfix  ######
-- 창이 정예/보스 우선타격하지 않던 버그 수정
-- 레벨업 즉시 카드선택이 뜨지 않던 버그 수정
-- 다른 브라우저로 접속 시 도감이 뜨지않던 버그 수정
-- 밸런스 수정
- -. 웨이브 별 적 체력배율 1.12 -> 1.11
- -. 쌍검특성 공격력배율 0.8 -> 1.0
- -. 기름특성 불길피해 1.5 -> 1.4
- -. 얼음파편 특성 공격력 2.2 -> 2.0
- -. 강화화약특성 공격력 1.15 -> 1.2
- -. 용암분출 각성 범위 1.35 -> 1.3
- -. 폭뢰쇠뇌 각성 공격력 0.37 -> 0.35
-     
-## 🆕 새로운 요소
+##### v7.3 최종패치  ######
+
+⚔️ 시작 병기 선택 
+ • 이제 궁수로 고정 시작하지 않습니다. 
+ • 게임을 시작하면 무작위 병기 3개 중 하나를 골라 첫 병기로 시작합니다. 
+ • 시작 선택은 레벨업이나 리롤을 소모하지 않습니다.
+⚖️ 밸런스 조정 
+ • 폭풍의 궁수: 적을 처치하고 남은 피해 이어가기 60% → 100%, 화살수 1 추가
+ • 레일건: 정예·보스에게 주는 피해 +30% 추가 
+ • 검성: 검기가 비행 중인 적(박쥐, 비행 중인 화룡)도 확실히 타격합니다.
+ • 검사, 창, 대포, 발리스타의 특성/진화의 공격력/공격속도 배율 증가 및 추가. (대폭 상향)
+🐉 보스 조정 
+ • 역병 주술사: 다시 등장할 때마다 치유 의식 차단에 필요한 공격 횟수가 덜 늘어납니다.
+ • 화룡: 웨이브 41 이후 숨결 피해가 늘어나는 폭이 줄었습니다.
+
+## 🆕 v7 패치노트 ##
 
 ### ⚔️ 신규 병기: 검사
 - 성 바로 앞에서 반달 모양으로 칼을 휘두르는 초근접 범위 병기입니다.
@@ -372,34 +356,10 @@
 - 지난 시즌 TOP3에게 👑 패왕, 🥈 2위, 🥉 3위 칭호가 닉네임 옆에 표시됩니다.
 - 이번 v7 랭킹은 새로 집계되고, v6 TOP3는 명예의 전당에서 볼 수 있습니다.
 
-## ⚖️ 밸런스 조정
-
-### 🏹 궁수
-| 항목 | 변경 전 | 변경 후 |
-|---|---|---|
-| 그림자 사수 | 공격력 ×4 / 최대 HP 2% | 공격력 **×2.8** / 최대 HP **1.0%** |
-| 폭풍의 궁수 | 공격력 ×1.2 | 공격력 **×1.3** |
-
-### ❄️얼음법사
-- **빙하 창기사**
-  - 공격력 ×2.5에서 **×2.1**로 하향되었습니다.
-  - 냉기 증폭은 20%, 무한 관통은 그대로입니다.
-
-### 🔱 창
-- **용기병**: 모든 창병이 보스를 우선 공격하고 보스 피해가 증가합니다.
-- **뇌신창**: 번개 연쇄 범위와 횟수가 강화되었습니다.
-
 ### 🔥 화염병
 - **화상 중첩**: 최대 5중첩, 중첩당 화상 피해 +10%, 3초 동안 유지되며 다시 맞으면 갱신됩니다.
 - **5중첩 효과**: 초당 최대 HP 0.3% 피해를 줍니다. 정예는 50%, 보스는 25%만 적용됩니다.
 - 장판이 겹치면 가장 강한 장판 하나만 피해를 줍니다.
-- 골렘의 화염 저항이 제거되었습니다.
-
-### 💣 대포 / 🏹 발리스타
-- **대포**: 불 속성이 제거되었습니다. 소이탄은 **고폭탄**, 네이팜 포격은 **초대형 포탄**으로 바뀌었습니다.
-- **자주포 부대**: 최종 공격력 +5%
-- **발리스타**: 기본 공격력 +5%
-- **레일건·폭뢰 쇠뇌**: 소폭 상향
 
 ### 🧱 성벽
 - 성벽 업그레이드가 **증축 → 요새화 / 가시 성벽** 계통으로 개편되었습니다.
@@ -462,7 +422,8 @@ const BASE_DMG_CAP = 10;           // 공격력 강화 한계 (각성하면 +3)
 const BAL = Object.freeze({ boltW: 8, railWidth: 4, railDmg: 2, railFalloff: 0.04,
   poisonDps: 0.5, poisonTime: 4, thunderDmg: 0.65, thunderRange: 210,
   stormChain: 3, guardPeriod: 4.5, guardGolem: 35, saintRange: 300, saintDmg: 0.7,
-  zeroPeriod: 7.5, expansionHp: 150 });
+  zeroPeriod: 7.5, expansionHp: 150,
+  stormCarry: 1, railElite: 0.3, dragonLateWave: 40, dragonLateGrowth: 0.6 });
 const BASE_CASTLE_HP = 500;
 const pct = n => Math.round(n * 100);
 const TRAIT_CAP = 4;              // 병기마다 특성은 최대 4개
@@ -524,10 +485,10 @@ const TYPES = {
 */
 const TRAITS = {
   sword: [
-    { id: "longBlade", name: "긴 칼날", desc: "베기 범위 +30%, 공격력 ×1.1 ", mod: m => { m.range *= 1.3; m.dmg *= 1.1; } },
+    { id: "longBlade", name: "긴 칼날", desc: "베기 범위 +30%, 공격력 ×1.5 ", mod: m => { m.range *= 1.3; m.dmg *= 1.5; } },
     { id: "dual", name: "쌍검", desc: "0.2초 뒤 공격력 100%로 한 번 더 벰", mod: m => { m.doubleSlash = 1; } },
     { id: "armorBreak", name: "갑옷 가르기", desc: "방어력 5 무시, 맞은 적 방어력 5초간 -3", mod: m => { m.armorPen += 5; m.armorBreak = 3; } },
-    { id: "lifesteal", name: "흡혈", desc: "검사로 처치 시 성 최대 HP의 0.4% 회복", mod: m => { m.lifeSteal = 0.004; } },
+    { id: "lifesteal", name: "흡혈", desc: "검사로 처치 시 성 최대 HP의 0.5% 회복", mod: m => { m.lifeSteal = 0.005; } },
     { id: "counter", name: "반격 자세", desc: "성이 피해를 받으면 분노(최대 3), 다음 베기 피해 증가", mod: m => { m.counter = true; } }
   ],
   archer: [
@@ -538,10 +499,10 @@ const TRAITS = {
     { id: "rapid",  name: "속사", desc: "공격속도 ×1.3", mod: m => { m.spd *= 1.3; } }
   ],
   spear: [
-    { id: "heavy",   name: "무거운 창", desc: "공격력 ×1.35", mod: m => { m.dmg *= 1.35; } },
+    { id: "heavy",   name: "무거운 창", desc: "공격력 ×2", mod: m => { m.dmg *= 2; } },
     { id: "twin",    name: "쌍창", desc: "한 번에 창 +1개 (다른 적 조준)", mod: m => { m.multi += 1; } },
     { id: "skewer",  name: "긴 창", desc: "관통 +2, 사거리 +60", mod: m => { m.pierce += 2; m.range += 60; } },
-    { id: "weak",    name: "약점 노리기", desc: "치명타 확률 +20%", mod: m => { m.crit += 0.2; } },
+    { id: "weak",    name: "약점 노리기", desc: "치명타 확률 +30%", mod: m => { m.crit += 0.3; } },
     { id: "execute", name: "처형", desc: "체력 15% 이하의 일반·정예 적 즉사", mod: m => { m.execute = Math.max(m.execute, 0.15); } }
   ],
   fire: [
@@ -559,7 +520,7 @@ const TRAITS = {
     { id: "brittle", name: "취약", desc: "냉기 받는 피해 증가 +20% → +40%", mod: m => { m.brittle += 0.2; } }
   ],
   ballista: [
-    { id: "bigBolt", name: "대형 볼트", desc: "공격력 ×1.4", mod: m => { m.dmg *= 1.4; } },
+    { id: "bigBolt", name: "대형 볼트", desc: "공격력 ×1.5", mod: m => { m.dmg *= 1.5; } },
     { id: "steel",   name: "강철 촉", desc: "방어력 8 무시", mod: m => { m.armorPen += 8; } },
     { id: "keep",    name: "유지력", desc: "관통할 때 피해 감소 12% → 6%", mod: m => { m.falloff = Math.min(m.falloff, 0.06); } },
     { id: "twinB",   name: "쌍발", desc: "볼트 +1발 (옆 줄)", mod: m => { m.multi += 1; } },
@@ -567,7 +528,7 @@ const TRAITS = {
   ],
   cannon: [
     { id: "caliber",  name: "대구경", desc: "폭발 범위 ×1.35", mod: m => { m.radius *= 1.35; } },
-    { id: "powder",   name: "강화 화약", desc: "공격력 ×1.2", mod: m => { m.dmg *= 1.2; } },
+    { id: "powder",   name: "강화 화약", desc: "공격력 ×1.3", mod: m => { m.dmg *= 1.3; } },
     { id: "shrapnel", name: "파편", desc: "폭발 후 소형 폭탄 3개 분열", mod: m => { m.split = Math.max(m.split, 3); } },
     { id: "reload",   name: "장전 숙련", desc: "공격속도 ×1.3", mod: m => { m.spd *= 1.3; } },
     { id: "shock",    name: "충격파", desc: "폭발 시 적을 25px 밀어냄", mod: m => { m.knock = Math.max(m.knock, 25); } }
@@ -576,11 +537,11 @@ const TRAITS = {
 
 const EVOS = {
   sword: [
-    { id: "bladeStorm", name: "칼날 폭풍", need: ["longBlade", "dual"], desc: "베기 범위 ×1.3, 추가 베기 피해 125%", mod: m => { m.range *= 1.3; m.doubleSlash = 1.25; } },
-    { id: "swordAura", name: "검기", need: ["longBlade", "armorBreak"], desc: `베기마다 사거리 220px 검기 1개 발사\n검기가 지나가는 범위에 공격력 65% 피해`, mod: m => { m.swordWave = 1; m.waveRange = 220; m.waveMul = 0.65; } },
-    { id: "bloodFeast", name: "피의 축제", need: ["dual", "lifesteal"], desc: "추가 베기 피해 100%, 처치 회복 1%", mod: m => { m.doubleSlash = 1; m.lifeSteal = 0.01; } },
+    { id: "bladeStorm", name: "폭풍 칼날", need: ["longBlade", "dual"], desc: "공격속도 ×1.3, 베기 범위 ×1.3, 추가 베기 피해 150%", mod: m => { m.spd *= 1.3; m.range *= 1.3; m.doubleSlash = 1.5; } },
+    { id: "swordAura", name: "검기", need: ["longBlade", "armorBreak"], desc: `베기마다 사거리 220px 검기 1개 발사\n검기가 지나가는 범위에 공격력 80% 피해`, mod: m => { m.swordWave = 1; m.waveRange = 220; m.waveMul = 0.80; } },
+    { id: "bloodFeast", name: "피의 축제", need: ["dual", "lifesteal"], desc: "공격속도 ×1.3, 추가 베기 피해 100%, 처치 회복 1%", mod: m => { m.spd *= 1.3; m.doubleSlash = 1; m.lifeSteal = 0.01; } },
     { id: "indomitable", name: "불굴", need: ["lifesteal", "counter"], desc: "분노 피해 증가 강화, 처치 회복 0.5%", mod: m => { m.counterMul = 0.5; m.lifeSteal = Math.max(m.lifeSteal, 0.005); } },
-    { id: "iai", name: "일섬", need: ["armorBreak", "counter"], desc: "방어력 12 무시, 분노가 있으면 치명타", mod: m => { m.armorPen += 7; m.iai = true; } }
+    { id: "iai", name: "일섬", need: ["armorBreak", "counter"], desc: "공격력 ×1.3, 방어력 12 무시, 분노가 있으면 치명타", mod: m => { m.dmg *= 1.3; m.armorPen += 7; m.iai = true; } }
   ],
   archer: [
     { id: "rain",    name: "화살비", need: ["multi", "pierce"], desc: "화살 +2발, 튕김 +1", mod: m => { m.multi += 2; m.chain += 1; } },
@@ -590,11 +551,11 @@ const EVOS = {
     { id: "plague",  name: "역병", need: ["poison", "rapid"], desc: "독 +80%, 독에 걸린 적이 죽으면 주변으로 전염", mod: m => { m.poison += 0.8; m.spreadPoison = true; } }
   ],
   spear: [
-    { id: "storm",   name: "창의 폭풍", need: ["twin", "skewer"], desc: "창 +1개, 관통 +2", mod: m => { m.multi += 1; m.pierce += 2; } },
-    { id: "hunter",  name: "사냥꾼", need: ["weak", "execute"], desc: "처형 기준 30%, 치명타 +15%, 공격속도 ×1.3", mod: m => { m.execute = 0.3; m.crit += 0.15; m.spd *= 1.3; } },
-    { id: "lance",   name: "관통 투창", need: ["heavy", "skewer"], desc: "관통 +4, 방어력 12 무시", mod: m => { m.pierce += 4; m.armorPen += 12; } },
-    { id: "berserk", name: "광전사", need: ["twin", "weak"], desc: "공격속도 ×1.6", mod: m => { m.spd *= 1.6; } },
-    { id: "giant",   name: "거인 사냥꾼", need: ["heavy", "execute"], desc: "보스 피해 ×2, 공격력 ×1.6, 사거리 +150", mod: m => { m.bossMul *= 2; m.dmg *= 1.6; m.range += 150; } }
+    { id: "storm",   name: "창의 폭풍", need: ["twin", "skewer"], desc: "창 +2개, 관통 +2, 공격속도 ×1.3", mod: m => { m.multi += 2; m.pierce += 2; m.spd *= 1.3; } },
+    { id: "hunter",  name: "사냥꾼", need: ["weak", "execute"], desc: "처형 기준 30%, 치명타 +20%, 공격속도 ×1.3", mod: m => { m.execute = 0.3; m.crit += 0.20; m.spd *= 1.3; } },
+    { id: "lance",   name: "관통 투창", need: ["heavy", "skewer"], desc: "관통 +8, 방어력 12 무시", mod: m => { m.pierce += 8; m.armorPen += 12; } },
+    { id: "berserk", name: "광전사", need: ["twin", "weak"], desc: "창 +1개, 공격속도 ×2", mod: m => {  m.multi += 1; m.spd *= 2; } },
+    { id: "giant",   name: "거인 사냥꾼", need: ["heavy", "execute"], desc: "보스 피해 ×2, 공격력 ×1.3, 사거리 +150", mod: m => { m.bossMul *= 2; m.dmg *= 1.3; m.range += 150; } }
   ],
   fire: [
     { id: "firestorm", name: "화염 폭풍", need: ["wide", "napalm"], desc: "범위 ×1.4, 불길 +2초, 불길 피해 ×1.3", mod: m => { m.radius *= 1.4; m.burnTime += 2; m.burnMul *= 1.3; } },
@@ -614,13 +575,13 @@ const EVOS = {
     { id: "thunder",  name: "천둥 볼트", need: ["bigBolt", "keep"], desc: "굵은 번개 볼트 (판정 폭 3배), 관통 감소 6%, 공격력 ×1.3", mod: m => { m.boltW = 24; m.falloff = Math.min(m.falloff, 0.06); m.dmg *= 1.3; } },
     { id: "scatter",  name: "산탄 볼트", need: ["twinB", "steel"], desc: "볼트 +2발", mod: m => { m.multi += 2; } },
     { id: "hunt",     name: "사냥 표식", need: ["mark", "keep"], desc: "표식 피해 증가 +50%, 볼트 +1발, 공격속도 ×1.25", mod: m => { m.mark += 0.5; m.multi += 1; m.spd *= 1.25; } },
-    { id: "siege",    name: "공성 쇠뇌", need: ["bigBolt", "steel"], desc: "방어력 15 추가 무시, 공격력 ×1.2, 공격속도 ×1.4", mod: m => { m.armorPen += 15; m.dmg *= 1.2; m.spd *= 1.4; } },
-    { id: "repeater", name: "연사 쇠뇌", need: ["twinB", "mark"], desc: "공격속도 ×1.6", mod: m => { m.spd *= 1.6; } }
+    { id: "siege",    name: "공성 쇠뇌", need: ["bigBolt", "steel"], desc: "방어력 15 추가 무시, 공격력 ×1.3, 공격속도 ×1.5", mod: m => { m.armorPen += 15; m.dmg *= 1.3; m.spd *= 1.5; } },
+    { id: "repeater", name: "연사 쇠뇌", need: ["twinB", "mark"], desc: "공격속도 ×2", mod: m => { m.spd *= 2; } }
   ],
   cannon: [
-    { id: "cluster",  name: "집속탄", need: ["shrapnel", "caliber"], desc: "소형 폭탄 7개로 분열", mod: m => { m.split = 7; } },
-    { id: "heavyShell", name: "초대형 포탄", need: ["powder", "caliber"], desc: "공격력 ×1.35, 범위 ×1.2", mod: m => { m.dmg *= 1.35; m.radius *= 1.2; } },
-    { id: "barrage",  name: "연속 포격", need: ["shock", "reload"], desc: "포탄 +1발, 공격속도 ×1.2", mod: m => { m.multi += 1; m.spd *= 1.2; } },
+    { id: "cluster",  name: "집속탄", need: ["shrapnel", "caliber"], desc: "소형 폭탄 8개로 분열", mod: m => { m.split = 8; } },
+    { id: "heavyShell", name: "초대형 포탄", need: ["powder", "caliber"], desc: "공격력 ×1.5, 범위 ×1.5", mod: m => { m.dmg *= 1.5; m.radius *= 1.5; } },
+    { id: "barrage",  name: "연속 포격", need: ["shock", "reload"], desc: "포탄 +1발, 공격속도 ×1.5", mod: m => { m.multi += 1; m.spd *= 1.5; } },
     { id: "siegeGun", name: "공성포", need: ["caliber", "reload"], desc: "공격력 ×1.8, 보스 피해 ×1.5", mod: m => { m.dmg *= 1.8; m.bossMul *= 1.5; } },
     { id: "frag",     name: "파쇄탄", need: ["shrapnel", "shock"], desc: "방어력 15 무시, 분열 5개", mod: m => { m.armorPen += 15; m.split = Math.max(m.split, 5); } }
   ]
@@ -633,11 +594,11 @@ const EVOS = {
 */
 const AWAKENS = {
   sword: [
-    { id: "swordSaint", name: "검성", need: { dmg: 5, spd: 0 }, aura: "#f8fafc", desc: `베기마다 사거리 ${BAL.saintRange}px 검기 3갈래 발사\n검기가 지나가는 범위에 공격력 ${pct(BAL.saintDmg)}% 피해 (한 번의 발사당 적마다 1회)`, mod: m => { m.swordSaint = true; m.waveRange = BAL.saintRange; m.waveMul = BAL.saintDmg; } },
+    { id: "swordSaint", name: "검성", need: { dmg: 5, spd: 0 }, aura: "#f8fafc", desc: `베기마다 사거리 ${BAL.saintRange}px 검기 3갈래 발사\n검기가 지나가는 범위에 공격력 ${pct(BAL.saintDmg)}% 피해 (한 번의 발사당 적마다 1회)\n검기는 비행 중인 적도 타격`, mod: m => { m.swordSaint = true; m.waveRange = BAL.saintRange; m.waveMul = BAL.saintDmg; } },
     { id: "guardian", name: "철벽 수문장", need: { dmg: 2, spd: 3 }, aura: "#60a5fa", desc: `${BAL.guardPeriod}초마다 성 앞 적을 130px 선까지 밀어냄\n보스 면역, 골렘은 최대 ${BAL.guardGolem}px 밀림`, mod: m => { m.guardian = true; } }
   ],
   archer: [
-    { id: "stormArcher", name: "폭풍의 궁수", need: { dmg: 3, spd: 2 }, aura: "#fbbf24", desc: `화살 +1발, 튕김 +${BAL.stormChain}, 공격력 ×1.4\n남은 피해 이어가기 60%`, mod: m => { m.multi += 1; m.chain += BAL.stormChain; m.dmg *= 1.4; m.carry = 0.6; } },
+    { id: "stormArcher", name: "폭풍의 궁수", need: { dmg: 3, spd: 2 }, aura: "#fbbf24", desc: `화살 +2발, 튕김 +${BAL.stormChain}, 공격력 ×1.4\n남은 피해 이어가기 ${pct(BAL.stormCarry)}%`, mod: m => { m.multi += 2; m.chain += BAL.stormChain; m.dmg *= 1.4; m.carry = BAL.stormCarry; } },
     { id: "shadow",      name: "그림자 사수", need: { dmg: 0, spd: 5 }, aura: "#a855f7", desc: "6번째 공격마다 그림자 화살 발사\n(한 줄 무한 관통, 공격력 ×2.8 + 최대 체력 1.0%)", mod: m => { m.shadow = true; } }
   ],
   spear: [
@@ -653,11 +614,11 @@ const AWAKENS = {
     { id: "glacier",     name: "빙하 창기사", need: { dmg: 5, spd: 0 }, aura: "#38bdf8", desc: "무한 관통 얼음 창으로 변경\n공격력 ×2.1, 냉기 피해 증가 +20%", mod: m => { m.line = true; m.pierce = 999; m.dmg *= 2.1; m.brittle += 0.2; m.lineW = 12; } }
   ],
   ballista: [
-    { id: "railgun",     name: "레일건", need: { dmg: 5, spd: 0 }, aura: "#e879f9", desc: `순식간에 화면을 꿰뚫는 광선\n공격력 ×${BAL.railDmg}, 기본 볼트 판정 폭의 ${BAL.railWidth}배, 관통당 피해 ${pct(BAL.railFalloff)}% 감소`, mod: m => { m.dmg *= BAL.railDmg; m.boltW = BAL.boltW * BAL.railWidth; m.falloff = Math.min(m.falloff, BAL.railFalloff); m.boltSpeed = 3200; } },
+    { id: "railgun",     name: "레일건", need: { dmg: 5, spd: 0 }, aura: "#e879f9", desc: `순식간에 화면을 꿰뚫는 광선\n공격력 ×${BAL.railDmg}, 기본 볼트 판정 폭의 ${BAL.railWidth}배, 관통당 피해 ${pct(BAL.railFalloff)}% 감소\n정예·보스 피해 +${pct(BAL.railElite)}%`, mod: m => { m.eliteMul += BAL.railElite; m.dmg *= BAL.railDmg; m.boltW = BAL.boltW * BAL.railWidth; m.falloff = Math.min(m.falloff, BAL.railFalloff); m.boltSpeed = 3200; } },
     { id: "burstBolt",   name: "폭뢰 쇠뇌", need: { dmg: 2, spd: 3 }, aura: "#fb7185", desc: "볼트가 맞힐 때마다 폭발\n(반경 50, 공격력 35%)", mod: m => { m.boltBlast = 0.35; } }
   ],
   cannon: [
-    { id: "meteor",      name: "궤도 포격", need: { dmg: 5, spd: 0 }, aura: "#fde047", desc: "3번째 포격마다 운석 낙하\n(범위 ×2.2, 공격력 ×3.5)", mod: m => { m.meteor = true; } },
+    { id: "meteor",      name: "궤도 포격", need: { dmg: 5, spd: 0 }, aura: "#fde047", desc: "3번째 포격마다 운석 낙하\n(범위 ×2.2, 공격력 ×4)", mod: m => { m.meteor = true; } },
     { id: "artillery",   name: "자주포 부대", need: { dmg: 0, spd: 5 }, aura: "#a3e635", desc: "포탄 +2발, 공격속도 ×1.35, 공격력 ×1.05", mod: m => { m.multi += 2; m.spd *= 1.35; m.dmg *= 1.05; } }
   ]
 };
@@ -946,6 +907,7 @@ function buildTelemetry() {
     result: { time: round1(g.time), wave: g.wave, kills: g.kills, level: g.level },
     weapons,
     castle: { levels: { ...g.perks }, hp: round1(g.hp), maxHp: g.maxHp },
+    startWeapon: g.startWeapon,
     rerolls: { used: g.rerollsUsed, remaining: g.rerolls },
     bosses: { spawns: g.bossSpawns, kills: g.bossKills, death: { wave: g.wave, time: round1(g.time), alive: aliveBosses } },
     cards: {
@@ -1299,7 +1261,7 @@ function newGameData() {
     xp: 0, needXp: 3, level: 1, pendingLevels: 0,
     kills: 0, time: 0, wave: 1,
     spawnTimer: 1.2, shake: 0, roar: 0, flash: 0, flashColor: "#fff",
-    rerolls: 2, rerollsUsed: 0, pity: 0, bossReward: false,
+    rerolls: 2, rerollsUsed: 0, pity: 0, bossReward: false, startPick: false, startWeapon: null,
     rush: null, rushDoneWave: 0, combo: 0, comboTimer: 0, comboBest: 0,
     dmgBy: {},
     cardRolls: 0, cardOffers: {}, bossSpawns: [], bossKills: [],
@@ -1311,10 +1273,10 @@ function newGameData() {
   };
   for (const key of Object.keys(TYPES)) {
     data.units[key] = {
-      count: key === "archer" ? 1 : 0,     // 처음에는 궁수 1명만
+      count: 0,                             // 시작 병기는 게임 시작 시 선택
       dmgLv: 0, spdLv: 0,
       traits: new Set(), evo: null, awaken: null, awakenWave: null,
-      timers: key === "archer" ? [0.3] : [],
+      timers: [],
       shotN: 0, zeroT: BAL.zeroPeriod, guardianT: BAL.guardPeriod,
       echoes: [], counterStacks: 0,
       m: null
@@ -1412,11 +1374,25 @@ function startGame() {
   hiddenSpeed = false;
   g = newGameData();
   for (const key of Object.keys(TYPES)) recompute(key);
-  hideModal();
-  setState("playing");
-  say("⚔️ 적이 몰려옵니다! 궁수가 자동으로 공격합니다.");
   renderRoster();
   updateHUD();
+  openStartPick();
+}
+// 시작 병기 선택: 7개 병기 중 중복 없이 무작위 3개 (레벨업·리롤 소모 없음)
+function openStartPick() {
+  const keys = Object.keys(TYPES);
+  for (let i = keys.length - 1; i > 0; i--) {   // 공평한 셔플 (Fisher-Yates)
+    const j = Math.floor(Math.random() * (i + 1));
+    [keys[i], keys[j]] = [keys[j], keys[i]];
+  }
+  keys.length = 3;
+  g.startPick = true;
+  pendingChoices = keys.map(key => ({ kind: "new", key, rarity: "common", start: true }));
+  setState("levelup");
+  renderChoices();
+  showModal("⚔️ 시작 병기 선택", "함께 싸울 첫 병기를 하나 고르세요. 고른 병기 1명으로 전투를 시작합니다.", "levelup");
+  $("modalTools").hidden = true;   // 시작 선택에는 리롤 없음
+  playCardSound();
 }
 function handleStartButton() {
   Sound.unlock();
@@ -1527,7 +1503,7 @@ function spawnBoss() {
       cd1: 3, cd2: 7,                         // 스킬 1, 2 재사용 대기
       dashPrep: 0, dash: 0,                   // 늑대왕
       wall: false, wallHp: 0, wallMax: 0, wallTime: 0,   // 철갑 장군
-      channel: 0, interrupts: 0, need: 4 + cycle, tp: [0.66, 0.33],   // 역병 주술사
+      channel: 0, interrupts: 0, need: 4 + Math.floor(cycle / 2), tp: [0.66, 0.33],   // 역병 주술사
       landCd: 10, landed: 0, breathCd: 2      // 화룡
     }
   });
@@ -1572,8 +1548,14 @@ function shamanHeal(b) {
   banner("💚 치유 의식 완료! 적이 회복했습니다", "#4ade80", 1.8);
 }
 // 화룡: 멀리서 성에 화염 숨결
+// 화룡 숨결 성장: 웨이브 40까지는 기존과 동일, 41 이후 추가 성장분만 60% 적용
+function dragonBreathScale() {
+  const w = g.wave, cap = BAL.dragonLateWave;
+  if (w <= cap) return dmgScale();
+  return 1 + (cap - 1) * 0.06 + (w - cap) * 0.06 * BAL.dragonLateGrowth;
+}
 function dragonBreath(b) {
-  const dmg = 20 * dmgScale() * (1 + b.boss.cycle * 0.3) * (1 - g.perks.fort * 0.1);
+  const dmg = 20 * dragonBreathScale() * (1 + b.boss.cycle * 0.3) * (1 - g.perks.fort * 0.1);
   g.hp -= dmg;
   chargeSwordCounter();
   g.shake = 0.3;
@@ -1686,7 +1668,7 @@ function swordSlash(mult=1, echo=false) {
     if (!e.dead && m.armorBreak) { e.armorShred=Math.max(e.armorShred,m.armorBreak); e.armorShredT=5; }
     if (state !== "playing") break;
   }
-    if (m.swordSaint || m.swordWave) launchSwordWaves(m, dmg);
+  if (m.swordSaint || m.swordWave) launchSwordWaves(m, dmg);
   g.effects.push({type:"slash",x:CASTLE_X+10,y:(FIELD_TOP+FIELD_BOTTOM)/2,r:m.range,life:.22,max:.22,color:charged?"#fbbf24":"#f8fafc"});
   if (!echo && m.doubleSlash) u.echoes.push({time:.2,mul:m.doubleSlash});
 }
@@ -1703,6 +1685,7 @@ function launchSwordWaves(m, dmg) {
   }
 }
 function updateSwordWave(s, dt) {
+  // 검기는 비행 적(박쥐·비행 중 화룡 포함)도 맞힌다: 비행 판정 필터를 두지 않음
   const step = Math.min(s.speed * dt, s.maxDist - s.travelled);
   const hits = [];
   for (const e of g.enemies) {
@@ -1710,7 +1693,6 @@ function updateSwordWave(s, dt) {
     const dx = e.x - s.x, dy = e.y - s.y;
     const along = dx * s.vx + dy * s.vy;
     const side = Math.abs(-dx * s.vy + dy * s.vx);
-    // A vertical blade segment sweeps the path; intersect the enemy circle.
     const extra = Math.max(0, side - s.halfWidth);
     if (extra > e.r) continue;
     const reach = Math.sqrt(Math.max(0, e.r * e.r - extra * extra));
@@ -1823,7 +1805,7 @@ function launch(key, target, j, shotN) {
     if (j > 0) { tx += (Math.random() - 0.5) * 90; ty += (Math.random() - 0.5) * 70; }
     tx = Math.max(CASTLE_X + 10, tx);
     g.shots.push({ mode: "aoe", key, sx: meteor ? tx + 120 : ox, sy: meteor ? -40 : oy, x: ox, y: oy, tx, ty,
-                   t: 0, dur: meteor ? 0.7 : Math.max(0.25, flight), dmg: meteor ? dmg * 3.5 : dmg,
+                   t: 0, dur: meteor ? 0.7 : Math.max(0.25, flight), dmg: meteor ? dmg * 4 : dmg,
                    small: false, meteor });
   }
 }
@@ -2672,7 +2654,7 @@ function renderChoices() {
   $("pityText").textContent = `희귀 보장까지 ${Math.max(1, PITY_LIMIT - g.pity)}회`;
 }
 function reroll() {
-  if (state !== "levelup" || g.rerolls <= 0) return;
+  if (state !== "levelup" || g.startPick || g.rerolls <= 0) return;
   g.rerolls -= 1;
   g.rerollsUsed += 1;
   pendingChoices = makeChoices();
@@ -2707,6 +2689,20 @@ function applyChoice(index) {
   if (state !== "levelup") return;
   const c = pendingChoices[index];
   if (!c) return;
+  if (c.start) {
+    g.startPick = false;
+    g.startWeapon = c.key;
+    gainWeapon(c.key);
+    recompute(c.key);
+    const t = TYPES[c.key];
+    say(`⚔️ 적이 몰려옵니다! ${t.icon} ${t.name}이(가) 자동으로 공격합니다.`);
+    Sound.play("pick");
+    renderRoster();
+    updateHUD();
+    hideModal();
+    setState("playing");
+    return;
+  }
   recordCardPick(c);
   const info = describe(c);
   if (c.kind === "perk") {
@@ -3077,7 +3073,6 @@ function drawShot(s) {
     ctx.rotate(Math.atan2(s.vy, s.vx));
     const w = s.halfWidth;
     ctx.shadowBlur = 14; ctx.shadowColor = s.color;
-    // 반달 칼날: 진행 방향으로 볼록한 초승달 + 흰 칼날선 + 잔상
     ctx.fillStyle = s.color;
     for (const [off, a] of [[-18, 0.18], [-9, 0.35], [0, 0.85]]) {
       ctx.globalAlpha = a;
@@ -3341,7 +3336,7 @@ $("shieldResText").textContent = Math.round((1 - SHIELD_AOE_RES) * 100);
 $("modalRank").hidden = !rankEnabled();
 renderRankBoards();
 loadRanking();
-const NOTICE_KEY = "castle_notice_v7_2";
+const NOTICE_KEY = "castle_notice_v7_3";
 if (localStorage.getItem(NOTICE_KEY) !== "1") {
 
   $("modal").hidden = true;
